@@ -11,20 +11,68 @@ import {
   Puzzle,
   Building2,
 } from 'lucide-react'
-import { PLACEHOLDER_AGENTS } from '@/lib/agents'
+import { getAgentBySlug } from '@/lib/agents'
 import { PRICING_LABELS, COMPLEXITY_LABELS, COMPLEXITY_DESCRIPTIONS } from '@/types/database'
+import { ReviewsSection } from '@/components/ReviewsSection'
 
 interface PageProps {
   params: { slug: string }
 }
 
-export function generateStaticParams() {
-  return PLACEHOLDER_AGENTS.map((a) => ({ slug: a.slug }))
+export const dynamic = 'force-dynamic'
+
+export async function generateMetadata({ params }: PageProps) {
+  const agent = await getAgentBySlug(params.slug)
+  if (!agent) return {}
+
+  const title = `${agent.name} Review — ${agent.tagline} | AgentFinder`
+  const description = agent.description.slice(0, 155) + '…'
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      siteName: 'AgentFinder',
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
+  }
 }
 
-export default function AgentDetailPage({ params }: PageProps) {
-  const agent = PLACEHOLDER_AGENTS.find((a) => a.slug === params.slug)
+export default async function AgentDetailPage({ params }: PageProps) {
+  const agent = await getAgentBySlug(params.slug)
   if (!agent) notFound()
+
+  const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://agentfinder.com'
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: agent.name,
+    description: agent.description,
+    url: agent.website ?? `${BASE_URL}/agents/${agent.slug}`,
+    applicationCategory: 'BusinessApplication',
+    ...(agent.average_rating !== null && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: agent.average_rating,
+        reviewCount: agent.review_count,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    }),
+    offers: {
+      '@type': 'Offer',
+      price: agent.pricing_model === 'free' ? '0' : undefined,
+      priceCurrency: 'USD',
+    },
+  }
 
   const complexityColor = {
     plug_and_play: 'bg-emerald-100 text-emerald-800',
@@ -35,6 +83,10 @@ export default function AgentDetailPage({ params }: PageProps) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Back */}
       <Link
         href="/agents"
@@ -180,6 +232,11 @@ export default function AgentDetailPage({ params }: PageProps) {
             </dl>
           </div>
         </div>
+      </div>
+
+      {/* Reviews */}
+      <div className="mt-8">
+        <ReviewsSection agentId={agent.id} />
       </div>
 
       {/* Back CTA */}

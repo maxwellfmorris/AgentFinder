@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed 's/—/-/g' /Users/sheamccusker/AgentFinder/supabase/seed_v2.sql)",
+      "Bash(mv /tmp/seed_v2_fixed.sql /Users/sheamccusker/AgentFinder/supabase/seed_v2.sql)",
+      "Bash(python3 -c ' *)",
+      "Bash(xxd)"
+    ]
+  }
+}

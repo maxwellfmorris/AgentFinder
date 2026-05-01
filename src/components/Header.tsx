@@ -37,6 +37,12 @@ export function Header() {
               Search agents…
             </Link>
             <Link
+              href="/submit"
+              className="hidden sm:block text-sm font-semibold text-indigo-600 border border-indigo-200 px-4 py-2 rounded-full hover:bg-indigo-50 transition-colors"
+            >
+              Submit an Agent
+            </Link>
+            <Link
               href="/agents"
               className="bg-indigo-600 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors"
             >

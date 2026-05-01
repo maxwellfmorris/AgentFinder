@@ -4,6 +4,18 @@ import { AgentCard } from '@/components/AgentCard'
 import { FilterSidebar } from '@/components/FilterSidebar'
 import { SearchBar } from '@/components/SearchBar'
 import type { PricingModel } from '@/types/database'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Browse AI Agents for Business',
+  description:
+    'Find the right AI agent for your team. Filter by category, pricing, and integrations. Verified listings with real user reviews.',
+  openGraph: {
+    title: 'Browse AI Agents for Business — AgentFinder',
+    description:
+      'Find the right AI agent for your team. Filter by category, pricing, and integrations.',
+  },
+}
 
 interface PageProps {
   searchParams: {

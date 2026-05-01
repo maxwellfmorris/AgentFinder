@@ -151,6 +151,27 @@ export async function getAgents(filters: AgentFilters = {}): Promise<Agent[]> {
   }
 }
 
+export async function getAgentBySlug(slug: string): Promise<Agent | null> {
+  const supabase = getSupabaseClient()
+
+  if (!supabase) {
+    return PLACEHOLDER_AGENTS.find((a) => a.slug === slug) ?? null
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('agents')
+      .select('*')
+      .eq('slug', slug)
+      .single()
+
+    if (error || !data) return null
+    return data as Agent
+  } catch {
+    return PLACEHOLDER_AGENTS.find((a) => a.slug === slug) ?? null
+  }
+}
+
 function filterLocally(agents: Agent[], filters: AgentFilters): Agent[] {
   let results = [...agents]
 

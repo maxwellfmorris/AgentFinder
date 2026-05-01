@@ -20,6 +20,16 @@ export interface Agent {
   review_count: number
 }
 
+export interface Review {
+  id: string
+  created_at: string
+  agent_id: string
+  user_id: string
+  user_email: string
+  rating: number
+  body: string
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -27,6 +37,11 @@ export type Database = {
         Row: Agent
         Insert: Omit<Agent, 'id' | 'created_at'>
         Update: Partial<Omit<Agent, 'id' | 'created_at'>>
+      }
+      reviews: {
+        Row: Review
+        Insert: Omit<Review, 'id' | 'created_at'>
+        Update: Partial<Omit<Review, 'id' | 'created_at'>>
       }
     }
     Views: Record<string, never>
