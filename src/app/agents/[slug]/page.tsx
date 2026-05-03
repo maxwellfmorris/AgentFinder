@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  CheckCircle,
   Star,
   ExternalLink,
   ArrowLeft,
@@ -10,9 +9,12 @@ import {
   Tag,
   Puzzle,
   Building2,
+  Shield,
 } from 'lucide-react'
-import { getAgentBySlug } from '@/lib/agents'
-import { PRICING_LABELS, COMPLEXITY_LABELS, COMPLEXITY_DESCRIPTIONS } from '@/types/database'
+import { getAgentBySlug, getLatestEvalsForAgent, getReviewStatsForAgent } from '@/lib/agents'
+import { PRICING_LABELS, COMPLEXITY_LABELS, COMPLEXITY_DESCRIPTIONS, TIER_DESCRIPTIONS } from '@/types/database'
+import { TierChip } from '@/components/TierChip'
+import { EvalRow } from '@/components/EvalRow'
 import { ReviewsSection } from '@/components/ReviewsSection'
 
 interface PageProps {
@@ -48,6 +50,11 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function AgentDetailPage({ params }: PageProps) {
   const agent = await getAgentBySlug(params.slug)
   if (!agent) notFound()
+
+  const [evals, reviewStats] = await Promise.all([
+    getLatestEvalsForAgent(agent.id),
+    getReviewStatsForAgent(agent.id),
+  ])
 
   const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://agentfinder.com'
 
@@ -120,37 +127,42 @@ export default async function AgentDetailPage({ params }: PageProps) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-slate-900">{agent.name}</h1>
-                {agent.verified && (
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">
-                    <CheckCircle size={11} />
-                    Verified
-                  </span>
-                )}
+                <TierChip tier={agent.trust_tier} size="md" />
               </div>
 
               <p className="text-slate-600 font-medium mb-3">{agent.tagline}</p>
 
-              {agent.average_rating !== null && (
-                <div className="flex items-center gap-2">
-                  <div className="flex">
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <Star
-                        key={n}
-                        size={16}
-                        className={
-                          n <= Math.round(agent.average_rating!)
-                            ? 'text-amber-400 fill-amber-400'
-                            : 'text-slate-200 fill-slate-200'
-                        }
-                      />
-                    ))}
+              {(reviewStats.verifiedCount > 0 || reviewStats.totalCount > 0) && (() => {
+                const primaryAvg = reviewStats.verifiedCount > 0
+                  ? reviewStats.verifiedAvg!
+                  : reviewStats.totalAvg!
+                return (
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <Star
+                            key={n}
+                            size={16}
+                            className={
+                              n <= Math.round(primaryAvg)
+                                ? 'text-amber-400 fill-amber-400'
+                                : 'text-slate-200 fill-slate-200'
+                            }
+                          />
+                        ))}
+                      </div>
+                      <span className="font-bold text-slate-900">{primaryAvg.toFixed(1)}</span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {reviewStats.verifiedCount > 0
+                        ? `Verified-user avg · ${reviewStats.verifiedCount} ${reviewStats.verifiedCount === 1 ? 'review' : 'reviews'} · all reviews avg ${reviewStats.totalAvg!.toFixed(1)} (${reviewStats.totalCount} total)`
+                        : `${reviewStats.totalCount} reviews — none from verified users yet`
+                      }
+                    </p>
                   </div>
-                  <span className="font-bold text-slate-900">{agent.average_rating.toFixed(1)}</span>
-                  <span className="text-slate-400 text-sm">
-                    ({agent.review_count.toLocaleString()} reviews)
-                  </span>
-                </div>
-              )}
+                )
+              })()}
             </div>
 
             {agent.website && (
@@ -196,6 +208,13 @@ export default async function AgentDetailPage({ params }: PageProps) {
                 </span>
               </Fact>
 
+              <Fact icon={<Shield size={15} />} label="Trust">
+                <TierChip tier={agent.trust_tier} size="md" />
+                <span className="text-xs text-slate-400 ml-2">
+                  {TIER_DESCRIPTIONS[agent.trust_tier]}
+                </span>
+              </Fact>
+
               <Fact icon={<Tag size={15} />} label="Pricing">
                 {PRICING_LABELS[agent.pricing_model]}
               </Fact>
@@ -232,6 +251,24 @@ export default async function AgentDetailPage({ params }: PageProps) {
             </dl>
           </div>
         </div>
+      </div>
+
+      {/* Performance */}
+      <div className="mt-8 bg-white rounded-2xl border border-slate-200 p-8">
+        <h2 className="text-lg font-bold text-slate-900 mb-6">
+          Performance
+        </h2>
+        {evals.length === 0 ? (
+          <p className="text-sm text-slate-400 text-center py-4">
+            No published evals yet. Agents reach the Vetted tier by publishing benchmark scores.
+          </p>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {evals.map((e) => (
+              <EvalRow key={e.id} eval_={e} />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Reviews */}

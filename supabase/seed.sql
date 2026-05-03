@@ -4,7 +4,7 @@
 insert into agents (
   name, slug, tagline, description, website, logo_url,
   category, industry_tags, platform_integrations,
-  pricing_model, setup_complexity, verified,
+  pricing_model, setup_complexity, trust_tier,
   average_rating, review_count
 ) values
 
@@ -20,7 +20,7 @@ insert into agents (
   ARRAY['Gmail', 'Outlook', 'Slack', 'Notion'],
   'freemium',
   'plug_and_play',
-  true,
+  'vetted',
   4.7,
   214
 ),
@@ -37,7 +37,7 @@ insert into agents (
   ARRAY['Zoom', 'Google Meet', 'Microsoft Teams', 'Notion', 'Jira'],
   'subscription',
   'plug_and_play',
-  true,
+  'audited',
   4.5,
   389
 ),
@@ -54,7 +54,7 @@ insert into agents (
   ARRAY['Google Sheets', 'Excel', 'Airtable', 'Salesforce', 'HubSpot'],
   'subscription',
   'low',
-  true,
+  'verified',
   4.3,
   156
 ),
@@ -71,7 +71,7 @@ insert into agents (
   ARRAY['Greenhouse', 'Lever', 'Workday', 'LinkedIn', 'Gmail'],
   'usage_based',
   'low',
-  false,
+  'listed',
   4.1,
   78
 ),
@@ -88,7 +88,7 @@ insert into agents (
   ARRAY['Salesforce', 'HubSpot', 'Zendesk', 'Gmail', 'Slack'],
   'subscription',
   'medium',
-  true,
+  'vetted',
   4.6,
   102
 );

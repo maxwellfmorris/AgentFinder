@@ -1,5 +1,6 @@
 import { getSupabaseClient } from './supabase'
-import type { Agent, PricingModel } from '@/types/database'
+import type { Agent, AgentEval, PricingModel, TrustTier, UsageClaim } from '@/types/database'
+import { isVerifiedUsage } from '@/types/database'
 
 export const PLACEHOLDER_AGENTS: Agent[] = [
   {
@@ -17,7 +18,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     platform_integrations: ['Gmail', 'Outlook', 'Slack', 'Notion'],
     pricing_model: 'freemium',
     setup_complexity: 'plug_and_play',
-    verified: true,
+    trust_tier: 'vetted' as TrustTier,
     average_rating: 4.7,
     review_count: 214,
   },
@@ -36,7 +37,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     platform_integrations: ['Zoom', 'Google Meet', 'Microsoft Teams', 'Notion', 'Jira'],
     pricing_model: 'subscription',
     setup_complexity: 'plug_and_play',
-    verified: true,
+    trust_tier: 'audited' as TrustTier,
     average_rating: 4.5,
     review_count: 389,
   },
@@ -55,7 +56,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     platform_integrations: ['Google Sheets', 'Excel', 'Airtable', 'Salesforce', 'HubSpot'],
     pricing_model: 'subscription',
     setup_complexity: 'low',
-    verified: true,
+    trust_tier: 'verified' as TrustTier,
     average_rating: 4.3,
     review_count: 156,
   },
@@ -74,7 +75,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     platform_integrations: ['Greenhouse', 'Lever', 'Workday', 'LinkedIn', 'Gmail'],
     pricing_model: 'usage_based',
     setup_complexity: 'low',
-    verified: false,
+    trust_tier: 'listed' as TrustTier,
     average_rating: 4.1,
     review_count: 78,
   },
@@ -93,7 +94,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     platform_integrations: ['Salesforce', 'HubSpot', 'Zendesk', 'Gmail', 'Slack'],
     pricing_model: 'subscription',
     setup_complexity: 'medium',
-    verified: true,
+    trust_tier: 'vetted' as TrustTier,
     average_rating: 4.6,
     review_count: 102,
   },
@@ -197,4 +198,70 @@ function filterLocally(agents: Agent[], filters: AgentFilters): Agent[] {
   }
 
   return results
+}
+
+export async function getLatestEvalsForAgent(agentId: string): Promise<AgentEval[]> {
+  const supabase = getSupabaseClient()
+  if (!supabase) return []
+
+  try {
+    const { data, error } = await supabase
+      .from('agent_evals')
+      .select('*')
+      .eq('agent_id', agentId)
+      .order('evaluated_at', { ascending: false })
+
+    if (error || !data) return []
+
+    // Dedupe by benchmark_name, keeping the most recent row (data is already sorted desc)
+    const seen = new Set<string>()
+    const latest: AgentEval[] = []
+    for (const row of data as AgentEval[]) {
+      if (!seen.has(row.benchmark_name)) {
+        seen.add(row.benchmark_name)
+        latest.push(row)
+      }
+    }
+    return latest
+  } catch {
+    return []
+  }
+}
+
+export interface ReviewStats {
+  totalCount: number
+  totalAvg: number | null
+  verifiedCount: number
+  verifiedAvg: number | null
+}
+
+export async function getReviewStatsForAgent(agentId: string): Promise<ReviewStats> {
+  const empty: ReviewStats = { totalCount: 0, totalAvg: null, verifiedCount: 0, verifiedAvg: null }
+  const supabase = getSupabaseClient()
+  if (!supabase) return empty
+
+  try {
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('id, rating, usage_claim')
+      .eq('agent_id', agentId)
+
+    if (error || !data) return empty
+
+    const rows = data as { id: string; rating: number; usage_claim: UsageClaim }[]
+    const totalCount = rows.length
+    const totalAvg = totalCount > 0
+      ? Math.round((rows.reduce((s, r) => s + r.rating, 0) / totalCount) * 100) / 100
+      : null
+
+    const verified = rows.filter((r) => isVerifiedUsage(r.usage_claim))
+    const verifiedCount = verified.length
+    const verifiedAvg = verifiedCount > 0
+      ? Math.round((verified.reduce((s, r) => s + r.rating, 0) / verifiedCount) * 100) / 100
+      : null
+
+    return { totalCount, totalAvg, verifiedCount, verifiedAvg }
+  } catch {
+    return empty
+  }
 }

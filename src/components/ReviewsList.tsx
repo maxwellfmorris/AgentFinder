@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { Star } from 'lucide-react'
 import { getSupabaseBrowser } from '@/lib/supabase-browser'
+import type { UsageClaim } from '@/types/database'
+import { isVerifiedUsage } from '@/types/database'
 
 interface Review {
   id: string
@@ -10,11 +12,24 @@ interface Review {
   user_email: string
   rating: number
   body: string
+  usage_claim: UsageClaim
+  months_used: number | null
 }
 
 interface ReviewsListProps {
   agentId: string
   refreshKey: number
+}
+
+function VerifiedChip({ claim, months }: { claim: UsageClaim; months: number | null }) {
+  if (!isVerifiedUsage(claim)) return null
+  const label = claim === 'paying' ? 'paying' : 'on free trial'
+  const text = months !== null ? `Verified user · ${label} · ${months} months` : `Verified user · ${label}`
+  return (
+    <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700">
+      {text}
+    </span>
+  )
 }
 
 export function ReviewsList({ agentId, refreshKey }: ReviewsListProps) {
@@ -25,7 +40,7 @@ export function ReviewsList({ agentId, refreshKey }: ReviewsListProps) {
   useEffect(() => {
     supabase
       .from('reviews')
-      .select('id, created_at, user_email, rating, body')
+      .select('id, created_at, user_email, rating, body, usage_claim, months_used')
       .eq('agent_id', agentId)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
@@ -55,13 +70,16 @@ export function ReviewsList({ agentId, refreshKey }: ReviewsListProps) {
               <p className="text-sm font-semibold text-slate-700">
                 {review.user_email.split('@')[0]}
               </p>
-              <p className="text-xs text-slate-400">
-                {new Date(review.created_at).toLocaleDateString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </p>
+              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                <p className="text-xs text-slate-400">
+                  {new Date(review.created_at).toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </p>
+                <VerifiedChip claim={review.usage_claim} months={review.months_used} />
+              </div>
             </div>
             <div className="flex gap-0.5 flex-shrink-0">
               {[1, 2, 3, 4, 5].map((n) => (

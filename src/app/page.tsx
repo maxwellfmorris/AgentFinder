@@ -13,7 +13,9 @@ const CATEGORIES = [
 ]
 
 export default function HomePage() {
-  const featured = PLACEHOLDER_AGENTS.filter((a) => a.verified).slice(0, 3)
+  const featured = PLACEHOLDER_AGENTS.filter((a) =>
+    ['verified', 'vetted', 'audited'].includes(a.trust_tier)
+  ).slice(0, 3)
 
   return (
     <div>
@@ -105,9 +107,9 @@ export default function HomePage() {
             <div className="bg-indigo-500/20 p-3 rounded-xl">
               <Shield size={28} className="text-indigo-400" />
             </div>
-            <h3 className="font-bold text-lg">Verified listings</h3>
+            <h3 className="font-bold text-lg">Tiered verification</h3>
             <p className="text-slate-400 text-sm leading-relaxed">
-              Every agent is manually reviewed by our team before it earns a Verified badge.
+              Every listing climbs a four-tier ladder — from self-submitted to independently audited — so you always know exactly how much scrutiny an agent has passed.
             </p>
           </div>
           <div className="flex flex-col items-center gap-3">

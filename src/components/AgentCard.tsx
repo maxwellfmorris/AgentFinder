@@ -1,8 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Star, CheckCircle, ExternalLink, Zap } from 'lucide-react'
+import { Star, ExternalLink, Zap } from 'lucide-react'
 import type { Agent } from '@/types/database'
 import { PRICING_LABELS, COMPLEXITY_LABELS } from '@/types/database'
+import { TierChip } from './TierChip'
 
 interface AgentCardProps {
   agent: Agent
@@ -50,13 +51,7 @@ export function AgentCard({ agent }: AgentCardProps) {
             <h3 className="font-bold text-slate-900 text-base leading-snug truncate">
               {agent.name}
             </h3>
-            {agent.verified && (
-              <CheckCircle
-                size={15}
-                className="flex-shrink-0 text-indigo-500 fill-indigo-100"
-                aria-label="Verified"
-              />
-            )}
+            <TierChip tier={agent.trust_tier} />
           </div>
 
           {/* Rating */}

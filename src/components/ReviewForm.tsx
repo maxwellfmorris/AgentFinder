@@ -5,15 +5,21 @@ import { Star, Loader2 } from 'lucide-react'
 import { useAuth } from './AuthProvider'
 import { SignInModal } from './SignInModal'
 import { getSupabaseBrowser } from '@/lib/supabase-browser'
+import type { UsageClaim } from '@/types/database'
+import { USAGE_CLAIM_LABELS, isVerifiedUsage } from '@/types/database'
 
 interface ReviewFormProps {
   agentId: string
   onReviewSubmitted: () => void
 }
 
+const USAGE_ORDER: UsageClaim[] = ['paying', 'free_trial', 'evaluating', 'none']
+
 export function ReviewForm({ agentId, onReviewSubmitted }: ReviewFormProps) {
   const { user } = useAuth()
   const [showSignIn, setShowSignIn] = useState(false)
+  const [usageClaim, setUsageClaim] = useState<UsageClaim | null>(null)
+  const [monthsUsed, setMonthsUsed] = useState('')
   const [rating, setRating] = useState(0)
   const [hovered, setHovered] = useState(0)
   const [body, setBody] = useState('')
@@ -50,12 +56,20 @@ export function ReviewForm({ agentId, onReviewSubmitted }: ReviewFormProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!usageClaim) {
+      setErrorMsg('Please select how you have used this agent.')
+      return
+    }
     if (rating === 0) {
       setErrorMsg('Please select a star rating.')
       return
     }
     setStatus('loading')
     setErrorMsg('')
+
+    const months = isVerifiedUsage(usageClaim) && monthsUsed !== ''
+      ? parseInt(monthsUsed, 10)
+      : null
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase.from('reviews') as any).insert({
@@ -64,6 +78,8 @@ export function ReviewForm({ agentId, onReviewSubmitted }: ReviewFormProps) {
       user_email: user!.email!,
       rating,
       body,
+      usage_claim: usageClaim,
+      months_used: months,
     })
 
     if (error) {
@@ -82,6 +98,41 @@ export function ReviewForm({ agentId, onReviewSubmitted }: ReviewFormProps) {
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
       <h3 className="font-bold text-slate-900">Write a review</h3>
+
+      {/* Usage claim */}
+      <div>
+        <p className="text-sm text-slate-500 mb-2">How have you used this agent?</p>
+        <div className="flex flex-col gap-2">
+          {USAGE_ORDER.map((claim) => (
+            <label key={claim} className="flex items-center gap-2.5 cursor-pointer">
+              <input
+                type="radio"
+                name="usage_claim"
+                value={claim}
+                checked={usageClaim === claim}
+                onChange={() => setUsageClaim(claim)}
+                className="accent-indigo-600"
+              />
+              <span className="text-sm text-slate-700">{USAGE_CLAIM_LABELS[claim]}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Months used — only for paying / free_trial */}
+      {usageClaim !== null && isVerifiedUsage(usageClaim) && (
+        <div>
+          <p className="text-sm text-slate-500 mb-2">How many months? <span className="text-slate-400">(optional)</span></p>
+          <input
+            type="number"
+            min={0}
+            value={monthsUsed}
+            onChange={(e) => setMonthsUsed(e.target.value)}
+            placeholder="e.g. 6"
+            className="w-28 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          />
+        </div>
+      )}
 
       {/* Star picker */}
       <div>
