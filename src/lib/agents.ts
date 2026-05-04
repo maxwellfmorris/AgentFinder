@@ -21,6 +21,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     trust_tier: 'vetted' as TrustTier,
     average_rating: 4.7,
     review_count: 214,
+    submitted_by_user_id: null,
   },
   {
     id: '2',
@@ -40,6 +41,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     trust_tier: 'audited' as TrustTier,
     average_rating: 4.5,
     review_count: 389,
+    submitted_by_user_id: null,
   },
   {
     id: '3',
@@ -59,6 +61,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     trust_tier: 'verified' as TrustTier,
     average_rating: 4.3,
     review_count: 156,
+    submitted_by_user_id: null,
   },
   {
     id: '4',
@@ -78,6 +81,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     trust_tier: 'listed' as TrustTier,
     average_rating: 4.1,
     review_count: 78,
+    submitted_by_user_id: null,
   },
   {
     id: '5',
@@ -97,6 +101,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     trust_tier: 'vetted' as TrustTier,
     average_rating: 4.6,
     review_count: 102,
+    submitted_by_user_id: null,
   },
 ]
 
@@ -264,4 +269,33 @@ export async function getReviewStatsForAgent(agentId: string): Promise<ReviewSta
   } catch {
     return empty
   }
+}
+
+export async function getReviewCountSparkline(agentId: string, months = 6): Promise<number[]> {
+  const supabase = getSupabaseClient()
+  if (!supabase) return Array<number>(months).fill(0)
+
+  const cutoff = new Date()
+  cutoff.setMonth(cutoff.getMonth() - months)
+
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('created_at')
+    .eq('agent_id', agentId)
+    .gte('created_at', cutoff.toISOString())
+
+  if (error || !data) return Array<number>(months).fill(0)
+
+  const now = new Date()
+  const buckets = Array<number>(months).fill(0)
+
+  for (const row of data as { created_at: string }[]) {
+    const d = new Date(row.created_at)
+    const monthsAgo =
+      (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth())
+    const idx = months - 1 - monthsAgo
+    if (idx >= 0 && idx < months) buckets[idx]++
+  }
+
+  return buckets
 }

@@ -19,6 +19,7 @@ export interface Agent {
   trust_tier: TrustTier
   average_rating: number | null
   review_count: number
+  submitted_by_user_id: string | null
 }
 
 export type UsageClaim = 'paying' | 'free_trial' | 'evaluating' | 'none'
@@ -65,6 +66,14 @@ export const VERIFIED_BY_LABELS: Record<VerifiedBy, string> = {
   self_reported: 'Self-reported',
   agentfinder: 'AgentFinder verified',
   third_party: 'Third-party',
+}
+
+export const GRADE_COLORS: Record<LetterGrade, string> = {
+  A: 'bg-emerald-100 text-emerald-700',
+  B: 'bg-green-100 text-green-700',
+  C: 'bg-amber-100 text-amber-700',
+  D: 'bg-orange-100 text-orange-700',
+  F: 'bg-red-100 text-red-700',
 }
 
 export function getLetterGrade(score: number): LetterGrade {

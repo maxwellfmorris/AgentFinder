@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Search, Bot } from 'lucide-react'
+import { NavAuthLinks } from './NavAuthLinks'
 
 export function Header() {
   return (
@@ -36,6 +37,7 @@ export function Header() {
               <Search size={14} />
               Search agents…
             </Link>
+            <NavAuthLinks />
             <Link
               href="/submit"
               className="hidden sm:block text-sm font-semibold text-indigo-600 border border-indigo-200 px-4 py-2 rounded-full hover:bg-indigo-50 transition-colors"

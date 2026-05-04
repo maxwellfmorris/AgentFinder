@@ -1,16 +1,8 @@
-import type { AgentEval, LetterGrade } from '@/types/database'
-import { getLetterGrade, VERIFIED_BY_LABELS } from '@/types/database'
+import type { AgentEval } from '@/types/database'
+import { getLetterGrade, VERIFIED_BY_LABELS, GRADE_COLORS } from '@/types/database'
 
 interface EvalRowProps {
   eval_: AgentEval
-}
-
-const GRADE_COLORS: Record<LetterGrade, string> = {
-  A: 'bg-emerald-100 text-emerald-700',
-  B: 'bg-green-100 text-green-700',
-  C: 'bg-amber-100 text-amber-700',
-  D: 'bg-orange-100 text-orange-700',
-  F: 'bg-red-100 text-red-700',
 }
 
 export function EvalRow({ eval_ }: EvalRowProps) {

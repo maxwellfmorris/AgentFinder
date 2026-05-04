@@ -1,6 +1,7 @@
 'use server'
 
 import { getSupabaseClient } from '@/lib/supabase'
+import { getSupabaseServer } from '@/lib/supabase-server'
 import { CATEGORIES, PRICING_LABELS, COMPLEXITY_LABELS } from '@/types/database'
 import type { PricingModel, SetupComplexity } from '@/types/database'
 
@@ -215,6 +216,11 @@ export async function submitAgent(formData: FormData): Promise<SubmitResult> {
 
   const slug = toSlug(name)
 
+  // Capture the submitter's user ID if they're signed in (null for anonymous)
+  const serverClient = getSupabaseServer()
+  const { data: { user } } = await serverClient.auth.getUser()
+  const submitted_by_user_id = user?.id ?? null
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase.from('agents') as any).insert({
     name,
@@ -231,6 +237,7 @@ export async function submitAgent(formData: FormData): Promise<SubmitResult> {
     trust_tier: 'listed',
     average_rating: null,
     review_count: 0,
+    submitted_by_user_id,
   })
 
   if (error) {
