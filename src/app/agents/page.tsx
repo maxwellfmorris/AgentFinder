@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { getAgents } from '@/lib/agents'
+import { getAgents, getFeaturedAgents } from '@/lib/agents'
 import { AgentCard } from '@/components/AgentCard'
 import { FilterSidebar } from '@/components/FilterSidebar'
 import { SearchBar } from '@/components/SearchBar'
@@ -37,7 +37,12 @@ export default async function AgentsPage({ searchParams }: PageProps) {
   const integrations = toArray(searchParams.integration)
   const search = searchParams.q
 
-  const agents = await getAgents({ categories, pricingModels, integrations, search })
+  const [agents, categoryFeatured] = await Promise.all([
+    getAgents({ categories, pricingModels, integrations, search }),
+    categories.length > 0
+      ? getFeaturedAgents({ tier: 'category', category: categories[0], limit: 3 })
+      : Promise.resolve([]),
+  ])
 
   const activeFilterCount = categories.length + pricingModels.length + integrations.length
 
@@ -70,6 +75,18 @@ export default async function AgentsPage({ searchParams }: PageProps) {
 
         {/* Results */}
         <div className="flex-1 min-w-0">
+          {/* Sponsored row — only when category filter active and results exist */}
+          {categoryFeatured.length > 0 && (
+            <div className="mb-8">
+              <p className="text-[11px] text-slate-400 mb-2">sponsored</p>
+              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                {categoryFeatured.map((agent) => (
+                  <AgentCard key={agent.id} agent={agent} />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Results count */}
           <div className="flex items-center justify-between mb-5">
             <p className="text-sm text-slate-500">

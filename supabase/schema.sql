@@ -38,7 +38,12 @@ create table agents (
   review_count integer not null default 0,
 
   -- Ownership
-  submitted_by_user_id uuid references auth.users(id) on delete set null
+  submitted_by_user_id uuid references auth.users(id) on delete set null,
+
+  -- Featured placement (flat-fee, time-boxed)
+  featured_until timestamptz,
+  featured_tier text not null default 'none'
+    check (featured_tier in ('none','category','homepage'))
 );
 
 -- Full-text search index
@@ -47,6 +52,7 @@ create index agents_name_search on agents using gin(to_tsvector('english', name 
 create index agents_category on agents(category);
 create index agents_pricing on agents(pricing_model);
 create index agents_submitted_by on agents(submitted_by_user_id);
+create index agents_featured on agents(featured_until, featured_tier) where featured_tier <> 'none';
 
 create table agent_evals (
   id            uuid        primary key default gen_random_uuid(),

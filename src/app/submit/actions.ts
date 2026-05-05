@@ -2,7 +2,6 @@
 
 import { getSupabaseClient } from '@/lib/supabase'
 import { getSupabaseServer } from '@/lib/supabase-server'
-import { CATEGORIES, PRICING_LABELS, COMPLEXITY_LABELS } from '@/types/database'
 import type { PricingModel, SetupComplexity } from '@/types/database'
 
 // ── Smart import ──────────────────────────────────────────────────────────────

@@ -1,6 +1,7 @@
 export type PricingModel = 'free' | 'freemium' | 'subscription' | 'usage_based' | 'enterprise'
 export type SetupComplexity = 'plug_and_play' | 'low' | 'medium' | 'high'
 export type TrustTier = 'listed' | 'verified' | 'vetted' | 'audited'
+export type FeaturedTier = 'none' | 'category' | 'homepage'
 
 export interface Agent {
   id: string
@@ -20,6 +21,12 @@ export interface Agent {
   average_rating: number | null
   review_count: number
   submitted_by_user_id: string | null
+  featured_until: string | null
+  featured_tier: FeaturedTier
+}
+
+export function isFeatured(agent: { featured_until: string | null }): boolean {
+  return agent.featured_until !== null && new Date(agent.featured_until) > new Date()
 }
 
 export type UsageClaim = 'paying' | 'free_trial' | 'evaluating' | 'none'
@@ -88,19 +95,22 @@ export type Database = {
   public: {
     Tables: {
       agents: {
-        Row: Agent
-        Insert: Omit<Agent, 'id' | 'created_at'>
-        Update: Partial<Omit<Agent, 'id' | 'created_at'>>
+        Row: Agent & Record<string, unknown>
+        Insert: Omit<Agent, 'id' | 'created_at'> & Record<string, unknown>
+        Update: Partial<Omit<Agent, 'id' | 'created_at'>> & Record<string, unknown>
+        Relationships: []
       }
       reviews: {
-        Row: Review
-        Insert: Omit<Review, 'id' | 'created_at'>
-        Update: Partial<Omit<Review, 'id' | 'created_at'>>
+        Row: Review & Record<string, unknown>
+        Insert: Omit<Review, 'id' | 'created_at'> & Record<string, unknown>
+        Update: Partial<Omit<Review, 'id' | 'created_at'>> & Record<string, unknown>
+        Relationships: []
       }
       agent_evals: {
-        Row: AgentEval
-        Insert: Omit<AgentEval, 'id' | 'created_at'>
-        Update: Partial<Omit<AgentEval, 'id' | 'created_at'>>
+        Row: AgentEval & Record<string, unknown>
+        Insert: Omit<AgentEval, 'id' | 'created_at'> & Record<string, unknown>
+        Update: Partial<Omit<AgentEval, 'id' | 'created_at'>> & Record<string, unknown>
+        Relationships: []
       }
     }
     Views: Record<string, never>

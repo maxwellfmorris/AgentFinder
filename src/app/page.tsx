@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { ArrowRight, CheckCircle, Star, Zap, Shield } from 'lucide-react'
-import { PLACEHOLDER_AGENTS } from '@/lib/agents'
+import { PLACEHOLDER_AGENTS, getFeaturedAgents } from '@/lib/agents'
 import { AgentCard } from '@/components/AgentCard'
+import { isFeatured } from '@/types/database'
+import type { Agent } from '@/types/database'
 
 const CATEGORIES = [
   { label: 'Writing & Communication', emoji: '✍️', href: '/agents?category=Writing+%26+Communication' },
@@ -12,10 +14,19 @@ const CATEGORIES = [
   { label: 'Sales', emoji: '📈', href: '/agents?category=Sales' },
 ]
 
-export default function HomePage() {
-  const featured = PLACEHOLDER_AGENTS.filter((a) =>
-    ['verified', 'vetted', 'audited'].includes(a.trust_tier)
-  ).slice(0, 3)
+export default async function HomePage() {
+  const homepageFeatured = await getFeaturedAgents({ tier: 'homepage', limit: 3 })
+
+  // Supplement with top-rated placeholders until we have 3 cards
+  const featuredIds = new Set(homepageFeatured.map((a) => a.id))
+  const topRated = PLACEHOLDER_AGENTS.filter(
+    (a) => ['verified', 'vetted', 'audited'].includes(a.trust_tier) && !featuredIds.has(a.id)
+  )
+
+  const displayAgents: Array<{ agent: Agent; sponsored: boolean }> = [
+    ...homepageFeatured.map((a) => ({ agent: a, sponsored: true })),
+    ...topRated.map((a) => ({ agent: a, sponsored: false })),
+  ].slice(0, 3)
 
   return (
     <div>
@@ -94,8 +105,13 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featured.map((agent) => (
-            <AgentCard key={agent.id} agent={agent} />
+          {displayAgents.map(({ agent, sponsored }) => (
+            <div key={agent.id}>
+              <AgentCard agent={agent} />
+              {sponsored && isFeatured(agent) && (
+                <p className="text-[11px] text-slate-400 mt-1 pl-1">sponsored</p>
+              )}
+            </div>
           ))}
         </div>
       </section>

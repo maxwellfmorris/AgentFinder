@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { AlertTriangle } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { AlertTriangle, Loader2 } from 'lucide-react'
 import type { Agent, AgentEval } from '@/types/database'
-import { getLetterGrade, GRADE_COLORS } from '@/types/database'
+import { getLetterGrade, GRADE_COLORS, isFeatured } from '@/types/database'
 import type { ReviewStats } from '@/lib/agents'
 import { TierChip } from './TierChip'
 import { HowToClimbModal } from './HowToClimbModal'
+import { purchaseFeature } from '@/app/dashboard/feature-actions'
 
 interface DashboardCardProps {
   agent: Agent
@@ -93,9 +95,29 @@ function buildIssues(agent: Agent, stats: ReviewStats, evals: AgentEval[]): Issu
   return issues
 }
 
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
 export function DashboardCard({ agent, stats, evals, sparkline }: DashboardCardProps) {
+  const router = useRouter()
   const [showClimb, setShowClimb] = useState(false)
+  const [promoting, setPromoting] = useState(false)
+  const [promoteError, setPromoteError] = useState<string | null>(null)
   const issues = buildIssues(agent, stats, evals)
+  const featured = isFeatured(agent)
+
+  async function handlePromote() {
+    setPromoting(true)
+    setPromoteError(null)
+    const result = await purchaseFeature(agent.id, 'homepage', 30)
+    setPromoting(false)
+    if (!result.success) {
+      setPromoteError(result.error)
+    } else {
+      router.refresh()
+    }
+  }
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-6">
@@ -115,6 +137,25 @@ export function DashboardCard({ agent, stats, evals, sparkline }: DashboardCardP
           >
             How to climb →
           </button>
+          {featured && agent.featured_until ? (
+            <p className="text-xs text-amber-700">
+              Featured on {agent.featured_tier} until {formatDate(agent.featured_until)}
+            </p>
+          ) : (
+            <div className="flex flex-col items-end gap-1">
+              <button
+                onClick={handlePromote}
+                disabled={promoting}
+                className="inline-flex items-center gap-1 bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-xs hover:bg-amber-200 transition-colors disabled:opacity-60"
+              >
+                {promoting && <Loader2 size={10} className="animate-spin" />}
+                Promote this listing
+              </button>
+              {promoteError && (
+                <p className="text-xs text-red-600">{promoteError}</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

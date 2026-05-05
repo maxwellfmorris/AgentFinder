@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase'
-import type { Agent, AgentEval, PricingModel, TrustTier, UsageClaim } from '@/types/database'
+import type { Agent, AgentEval, FeaturedTier, PricingModel, TrustTier, UsageClaim } from '@/types/database'
 import { isVerifiedUsage } from '@/types/database'
 
 export const PLACEHOLDER_AGENTS: Agent[] = [
@@ -22,6 +22,8 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     average_rating: 4.7,
     review_count: 214,
     submitted_by_user_id: null,
+    featured_until: null,
+    featured_tier: 'none' as FeaturedTier,
   },
   {
     id: '2',
@@ -42,6 +44,8 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     average_rating: 4.5,
     review_count: 389,
     submitted_by_user_id: null,
+    featured_until: null,
+    featured_tier: 'none' as FeaturedTier,
   },
   {
     id: '3',
@@ -62,6 +66,8 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     average_rating: 4.3,
     review_count: 156,
     submitted_by_user_id: null,
+    featured_until: null,
+    featured_tier: 'none' as FeaturedTier,
   },
   {
     id: '4',
@@ -82,6 +88,8 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     average_rating: 4.1,
     review_count: 78,
     submitted_by_user_id: null,
+    featured_until: null,
+    featured_tier: 'none' as FeaturedTier,
   },
   {
     id: '5',
@@ -102,6 +110,8 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     average_rating: 4.6,
     review_count: 102,
     submitted_by_user_id: null,
+    featured_until: null,
+    featured_tier: 'none' as FeaturedTier,
   },
 ]
 
@@ -175,6 +185,35 @@ export async function getAgentBySlug(slug: string): Promise<Agent | null> {
     return data as Agent
   } catch {
     return PLACEHOLDER_AGENTS.find((a) => a.slug === slug) ?? null
+  }
+}
+
+export async function getFeaturedAgents(opts: {
+  tier: FeaturedTier
+  category?: string
+  limit: number
+}): Promise<Agent[]> {
+  const supabase = getSupabaseClient()
+  if (!supabase) return []
+
+  try {
+    let query = supabase
+      .from('agents')
+      .select('*')
+      .eq('featured_tier', opts.tier)
+      .gt('featured_until', new Date().toISOString())
+      .order('featured_until', { ascending: false })
+      .limit(opts.limit)
+
+    if (opts.category) {
+      query = query.eq('category', opts.category)
+    }
+
+    const { data, error } = await query
+    if (error || !data) return []
+    return data as Agent[]
+  } catch {
+    return []
   }
 }
 

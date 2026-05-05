@@ -2,7 +2,7 @@
 
 import { X } from 'lucide-react'
 import type { TrustTier } from '@/types/database'
-import { TIER_LABELS, TIER_DESCRIPTIONS, TIER_COLORS } from '@/types/database'
+import { TIER_DESCRIPTIONS } from '@/types/database'
 import { TierChip } from './TierChip'
 
 const TIER_ORDER: TrustTier[] = ['listed', 'verified', 'vetted', 'audited']
