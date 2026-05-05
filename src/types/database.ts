@@ -102,6 +102,18 @@ export function getLetterGrade(score: number): LetterGrade {
   return 'F'
 }
 
+export interface SearchEvent {
+  id: string
+  created_at: string
+  event_type: 'search' | 'click'
+  session_id: string
+  user_id: string | null
+  query: string
+  result_count: number | null
+  agent_id: string | null
+  position: number | null
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -127,6 +139,12 @@ export type Database = {
         Row: AgentTask & Record<string, unknown>
         Insert: Omit<AgentTask, 'id' | 'created_at'> & Record<string, unknown>
         Update: Partial<Omit<AgentTask, 'id' | 'created_at'>> & Record<string, unknown>
+        Relationships: []
+      }
+      search_events: {
+        Row: SearchEvent & Record<string, unknown>
+        Insert: Omit<SearchEvent, 'id' | 'created_at'> & Record<string, unknown>
+        Update: Partial<Omit<SearchEvent, 'id' | 'created_at'>> & Record<string, unknown>
         Relationships: []
       }
     }
