@@ -11,11 +11,12 @@ import {
   Building2,
   Shield,
 } from 'lucide-react'
-import { getAgentBySlug, getLatestEvalsForAgent, getReviewStatsForAgent } from '@/lib/agents'
+import { getAgentBySlug, getLatestEvalsForAgent, getReviewStatsForAgent, getTasksForAgent } from '@/lib/agents'
 import { PRICING_LABELS, COMPLEXITY_LABELS, COMPLEXITY_DESCRIPTIONS, TIER_DESCRIPTIONS } from '@/types/database'
 import { TierChip } from '@/components/TierChip'
 import { EvalRow } from '@/components/EvalRow'
 import { ReviewsSection } from '@/components/ReviewsSection'
+import { QuickTaskCard } from '@/components/QuickTaskCard'
 
 interface PageProps {
   params: { slug: string }
@@ -51,9 +52,10 @@ export default async function AgentDetailPage({ params }: PageProps) {
   const agent = await getAgentBySlug(params.slug)
   if (!agent) notFound()
 
-  const [evals, reviewStats] = await Promise.all([
+  const [evals, reviewStats, tasks] = await Promise.all([
     getLatestEvalsForAgent(agent.id),
     getReviewStatsForAgent(agent.id),
+    getTasksForAgent(agent.id),
   ])
 
   const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://agentfinder.com'
@@ -178,6 +180,20 @@ export default async function AgentDetailPage({ params }: PageProps) {
             )}
           </div>
         </div>
+
+        {/* Quick Tasks — only rendered when at least one task exists */}
+        {tasks.length > 0 && (
+          <div className="p-8 border-b border-slate-100">
+            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">
+              Quick Tasks
+            </h2>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {tasks.map((task) => (
+                <QuickTaskCard key={task.id} task={task} agentWebsite={agent.website} />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Details grid */}
         <div className="grid sm:grid-cols-2 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">

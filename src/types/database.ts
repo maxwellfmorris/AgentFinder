@@ -54,6 +54,17 @@ export interface Review {
   months_used: number | null
 }
 
+export interface AgentTask {
+  id: string
+  created_at: string
+  agent_id: string
+  title: string
+  description: string
+  price_usd: number
+  expected_duration_minutes: number | null
+  available: boolean
+}
+
 export type VerifiedBy = 'self_reported' | 'agentfinder' | 'third_party'
 export type LetterGrade = 'A' | 'B' | 'C' | 'D' | 'F'
 
@@ -110,6 +121,12 @@ export type Database = {
         Row: AgentEval & Record<string, unknown>
         Insert: Omit<AgentEval, 'id' | 'created_at'> & Record<string, unknown>
         Update: Partial<Omit<AgentEval, 'id' | 'created_at'>> & Record<string, unknown>
+        Relationships: []
+      }
+      agent_tasks: {
+        Row: AgentTask & Record<string, unknown>
+        Insert: Omit<AgentTask, 'id' | 'created_at'> & Record<string, unknown>
+        Update: Partial<Omit<AgentTask, 'id' | 'created_at'>> & Record<string, unknown>
         Relationships: []
       }
     }

@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase'
-import type { Agent, AgentEval, FeaturedTier, PricingModel, TrustTier, UsageClaim } from '@/types/database'
+import type { Agent, AgentEval, AgentTask, FeaturedTier, PricingModel, TrustTier, UsageClaim } from '@/types/database'
 import { isVerifiedUsage } from '@/types/database'
 
 export const PLACEHOLDER_AGENTS: Agent[] = [
@@ -337,4 +337,24 @@ export async function getReviewCountSparkline(agentId: string, months = 6): Prom
   }
 
   return buckets
+}
+
+export async function getTasksForAgent(agentId: string): Promise<AgentTask[]> {
+  const supabase = getSupabaseClient()
+  if (!supabase) return []
+
+  try {
+    const { data, error } = await supabase
+      .from('agent_tasks')
+      .select('*')
+      .eq('agent_id', agentId)
+      .eq('available', true)
+      .order('created_at', { ascending: false })
+      .limit(4)
+
+    if (error || !data) return []
+    return data as AgentTask[]
+  } catch {
+    return []
+  }
 }
