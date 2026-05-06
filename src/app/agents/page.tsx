@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { getAgents, getFeaturedAgents } from '@/lib/agents'
 import { logSearchEvent } from '@/lib/events'
 import { AgentCard } from '@/components/AgentCard'
+import SearchResultLink from '@/components/SearchResultLink'
 import { FilterSidebar } from '@/components/FilterSidebar'
 import { SearchBar } from '@/components/SearchBar'
 import type { PricingModel } from '@/types/database'
@@ -120,8 +121,13 @@ export default async function AgentsPage({ searchParams }: PageProps) {
             <EmptyState />
           ) : (
             <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
-              {agents.map((agent) => (
-                <AgentCard key={agent.id} agent={agent} />
+              {agents.map((agent, i) => (
+                <SearchResultLink
+                  key={agent.id}
+                  agent={agent}
+                  position={i + 1}
+                  query={search?.trim() || null}
+                />
               ))}
             </div>
           )}

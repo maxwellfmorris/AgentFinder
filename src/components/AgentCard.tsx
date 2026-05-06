@@ -7,6 +7,7 @@ import { TierChip } from './TierChip'
 
 interface AgentCardProps {
   agent: Agent
+  onView?: () => void
 }
 
 const COMPLEXITY_COLOR = {
@@ -24,7 +25,7 @@ const PRICING_COLOR: Record<string, string> = {
   enterprise: 'bg-slate-100 text-slate-700',
 }
 
-export function AgentCard({ agent }: AgentCardProps) {
+export function AgentCard({ agent, onView }: AgentCardProps) {
   return (
     <div className="group bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-lg hover:border-indigo-200 transition-all flex flex-col">
       {/* Header */}
@@ -132,6 +133,7 @@ export function AgentCard({ agent }: AgentCardProps) {
       <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-3">
         <Link
           href={`/agents/${agent.slug}`}
+          onClick={onView}
           className="flex-1 text-center text-sm font-semibold text-indigo-600 border border-indigo-200 rounded-full py-2 hover:bg-indigo-50 transition-colors"
         >
           View Details
