@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowRight, CheckCircle, Star, Zap, Shield } from 'lucide-react'
 import { PLACEHOLDER_AGENTS, getFeaturedAgents } from '@/lib/agents'
 import { AgentCard } from '@/components/AgentCard'
+import { HomeSearch } from '@/components/HomeSearch'
 import { isFeatured } from '@/types/database'
 import type { Agent } from '@/types/database'
 
@@ -73,6 +74,11 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Task-driven search */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+        <HomeSearch />
       </section>
 
       {/* Browse by category */}

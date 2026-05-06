@@ -138,6 +138,12 @@ export async function getAgents(filters: AgentFilters = {}): Promise<Agent[]> {
     if (filters.pricingModels?.length) {
       query = query.in('pricing_model', filters.pricingModels)
     }
+    if (filters.search) {
+      query = query.textSearch('search_vector', filters.search, {
+        type: 'plain',
+        config: 'english',
+      })
+    }
 
     const { data, error } = await query
 
@@ -148,16 +154,6 @@ export async function getAgents(filters: AgentFilters = {}): Promise<Agent[]> {
     if (filters.integrations?.length) {
       results = results.filter((a) =>
         filters.integrations!.some((i) => a.platform_integrations.includes(i))
-      )
-    }
-
-    if (filters.search) {
-      const q = filters.search.toLowerCase()
-      results = results.filter(
-        (a) =>
-          a.name.toLowerCase().includes(q) ||
-          a.tagline.toLowerCase().includes(q) ||
-          a.description.toLowerCase().includes(q)
       )
     }
 
@@ -232,13 +228,14 @@ function filterLocally(agents: Agent[], filters: AgentFilters): Agent[] {
     )
   }
   if (filters.search) {
-    const q = filters.search.toLowerCase()
-    results = results.filter(
-      (a) =>
-        a.name.toLowerCase().includes(q) ||
-        a.tagline.toLowerCase().includes(q) ||
-        a.description.toLowerCase().includes(q)
-    )
+    const tokens = filters.search.toLowerCase().split(/\s+/).filter((t) => t.length > 1)
+    results = results.filter((a) => {
+      const haystack = `${a.name} ${a.tagline} ${a.description}`.toLowerCase()
+      return tokens.every((token) => {
+        const stems = [token, token.replace(/s$/, ''), token.replace(/ing$/, ''), token.replace(/ed$/, '')]
+        return stems.some((s) => haystack.includes(s))
+      })
+    })
   }
 
   return results

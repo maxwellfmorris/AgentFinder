@@ -43,11 +43,20 @@ create table agents (
   -- Featured placement (flat-fee, time-boxed)
   featured_until timestamptz,
   featured_tier text not null default 'none'
-    check (featured_tier in ('none','category','homepage'))
+    check (featured_tier in ('none','category','homepage')),
+
+  -- Full-text search (generated, immutable)
+  search_vector tsvector generated always as (
+    to_tsvector('english',
+      coalesce(name, '') || ' ' ||
+      coalesce(tagline, '') || ' ' ||
+      coalesce(description, '')
+    )
+  ) stored
 );
 
--- Full-text search index
-create index agents_name_search on agents using gin(to_tsvector('english', name || ' ' || tagline || ' ' || description));
+-- Full-text search GIN index
+create index agents_search_vector on agents using gin(search_vector);
 -- Fast filter indexes
 create index agents_category on agents(category);
 create index agents_pricing on agents(pricing_model);

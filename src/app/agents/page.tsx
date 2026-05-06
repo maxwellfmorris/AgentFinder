@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import { getAgents, getFeaturedAgents } from '@/lib/agents'
+import { logSearchEvent } from '@/lib/events'
 import { AgentCard } from '@/components/AgentCard'
 import { FilterSidebar } from '@/components/FilterSidebar'
 import { SearchBar } from '@/components/SearchBar'
@@ -45,6 +46,10 @@ export default async function AgentsPage({ searchParams }: PageProps) {
   ])
 
   const activeFilterCount = categories.length + pricingModels.length + integrations.length
+
+  if (search && search.trim()) {
+    logSearchEvent({ query: search.trim(), resultCount: agents.length }).catch(() => {})
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
