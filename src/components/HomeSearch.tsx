@@ -26,7 +26,7 @@ export function HomeSearch() {
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="e.g. summarize meeting notes, write better cold emails, screen resumes"
+          placeholder="e.g. plan a healthy week of meals, help me write a difficult email, summarize a long article"
           className="flex-1 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-base outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
         />
         <button

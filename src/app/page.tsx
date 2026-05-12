@@ -35,18 +35,18 @@ export default async function HomePage() {
       <section className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <div className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
-            <Star size={12} className="fill-indigo-500 text-indigo-500" />
-            Trusted by 10,000+ business professionals
+            No sales calls. No enterprise pricing. Just honest reviews.
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight max-w-3xl mx-auto">
-            Find the right AI agent
-            <span className="text-indigo-600"> for your team</span>
+            Find AI agents that
+            <span className="text-indigo-600"> actually fit your life</span>
           </h1>
 
           <p className="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            AgentFinder helps you discover, compare, and choose AI agents you can trust — without
-            needing a tech background. Real reviews from real professionals.
+            Discover and compare AI tools for the things you actually do — writing, planning,
+            learning, managing the parts of life that aren&apos;t your job. Honest reviews from
+            real users, no enterprise jargon.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
@@ -66,7 +66,7 @@ export default async function HomePage() {
           </div>
 
           <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-slate-500">
-            {['No credit card required', 'Verified agent listings', 'Plain-language explanations'].map((t) => (
+            {['No credit card required', 'Affiliate disclosure on every link', 'Plain-language explanations'].map((t) => (
               <span key={t} className="flex items-center gap-1.5">
                 <CheckCircle size={15} className="text-emerald-500" />
                 {t}
@@ -131,25 +131,25 @@ export default async function HomePage() {
             </div>
             <h3 className="font-bold text-lg">Tiered verification</h3>
             <p className="text-slate-400 text-sm leading-relaxed">
-              Every listing climbs a four-tier ladder — from self-submitted to independently audited — so you always know exactly how much scrutiny an agent has passed.
+              Every listing climbs a four-tier ladder — from self-submitted to independently audited — so you always know how much scrutiny an agent has passed before you give it your data.
             </p>
           </div>
           <div className="flex flex-col items-center gap-3">
             <div className="bg-indigo-500/20 p-3 rounded-xl">
               <Star size={28} className="text-indigo-400" />
             </div>
-            <h3 className="font-bold text-lg">Real reviews</h3>
+            <h3 className="font-bold text-lg">Honest reviews, no kickbacks</h3>
             <p className="text-slate-400 text-sm leading-relaxed">
-              Ratings come from verified users — no fake reviews, no paid placements.
+              Reviews come from verified users — never paid, never editorialized. We earn a commission when you subscribe to an agent, but that never affects our rankings or trust tiers. Featured placements are clearly labeled &ldquo;sponsored.&rdquo;
             </p>
           </div>
           <div className="flex flex-col items-center gap-3">
             <div className="bg-indigo-500/20 p-3 rounded-xl">
               <Zap size={28} className="text-indigo-400" />
             </div>
-            <h3 className="font-bold text-lg">Built for non-techies</h3>
+            <h3 className="font-bold text-lg">Made for everyday life</h3>
             <p className="text-slate-400 text-sm leading-relaxed">
-              We translate setup complexity and pricing into plain language anyone can understand.
+              From drafting a hard message to planning a healthy week, we explain what each agent actually does in plain language — without the enterprise jargon.
             </p>
           </div>
         </div>

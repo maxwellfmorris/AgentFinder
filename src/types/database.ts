@@ -189,8 +189,8 @@ export const COMPLEXITY_LABELS: Record<SetupComplexity, string> = {
 export const COMPLEXITY_DESCRIPTIONS: Record<SetupComplexity, string> = {
   plug_and_play: 'Ready in under 5 minutes',
   low: 'Up and running in an afternoon',
-  medium: 'May need IT help',
-  high: 'Requires a developer',
+  medium: 'A bit of setup, but worth it',
+  high: 'Technical — best for power users',
 }
 
 export const TIER_LABELS: Record<TrustTier, string> = {
