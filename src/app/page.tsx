@@ -8,11 +8,12 @@ import type { Agent } from '@/types/database'
 
 const CATEGORIES = [
   { label: 'Writing & Communication', emoji: '✍️', href: '/agents?category=Writing+%26+Communication' },
-  { label: 'Meetings & Notes', emoji: '📋', href: '/agents?category=Productivity+%26+Meetings' },
-  { label: 'Data & Analytics', emoji: '📊', href: '/agents?category=Data+%26+Analytics' },
-  { label: 'HR & Recruiting', emoji: '🤝', href: '/agents?category=HR+%26+Recruiting' },
-  { label: 'Customer Success', emoji: '💚', href: '/agents?category=Customer+Success' },
-  { label: 'Sales', emoji: '📈', href: '/agents?category=Sales' },
+  { label: 'Learning & Skills', emoji: '📚', href: '/agents?category=Learning+%26+Skills' },
+  { label: 'Money & Finances', emoji: '💰', href: '/agents?category=Money+%26+Finances' },
+  { label: 'Home & Family', emoji: '🏠', href: '/agents?category=Home+%26+Family' },
+  { label: 'Health & Wellness', emoji: '💪', href: '/agents?category=Health+%26+Wellness' },
+  { label: 'Hobbies & Creative', emoji: '🎨', href: '/agents?category=Hobbies+%26+Creative' },
+  { label: 'Travel & Planning', emoji: '✈️', href: '/agents?category=Travel+%26+Planning' },
 ]
 
 export default async function HomePage() {
@@ -84,7 +85,7 @@ export default async function HomePage() {
       {/* Browse by category */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <h2 className="text-2xl font-bold text-slate-900 mb-8">What can we help you with?</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
           {CATEGORIES.map((cat) => (
             <Link
               key={cat.label}
