@@ -3,7 +3,7 @@
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useCallback } from 'react'
 import { X, SlidersHorizontal } from 'lucide-react'
-import { CATEGORIES, POPULAR_INTEGRATIONS } from '@/types/database'
+import { CATEGORIES, POPULAR_INTEGRATIONS, LIFE_STAGE_TAGS } from '@/types/database'
 import type { PricingModel } from '@/types/database'
 
 const PRICING_OPTIONS: { value: PricingModel; label: string; description: string }[] = [
@@ -22,11 +22,13 @@ export function FilterSidebar() {
   const selectedCategories = searchParams.getAll('category')
   const selectedPricing = searchParams.getAll('pricing') as PricingModel[]
   const selectedIntegrations = searchParams.getAll('integration')
+  const selectedIndustries = searchParams.getAll('industry')
 
   const hasFilters =
     selectedCategories.length > 0 ||
     selectedPricing.length > 0 ||
-    selectedIntegrations.length > 0
+    selectedIntegrations.length > 0 ||
+    selectedIndustries.length > 0
 
   const updateParams = useCallback(
     (key: string, value: string, checked: boolean) => {
@@ -53,6 +55,7 @@ export function FilterSidebar() {
     params.delete('category')
     params.delete('pricing')
     params.delete('integration')
+    params.delete('industry')
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
@@ -95,6 +98,21 @@ export function FilterSidebar() {
             sublabel={description}
             checked={selectedPricing.includes(value)}
             onChange={(checked) => updateParams('pricing', value, checked)}
+          />
+        ))}
+      </FilterSection>
+
+      {/* Life-stage */}
+      <FilterSection title="For Who">
+        <p className="text-xs text-slate-400 mb-2">
+          Filter by who you are or what life stage you&apos;re in
+        </p>
+        {LIFE_STAGE_TAGS.map((tag) => (
+          <FilterCheckbox
+            key={tag}
+            label={tag}
+            checked={selectedIndustries.includes(tag)}
+            onChange={(checked) => updateParams('industry', tag, checked)}
           />
         ))}
       </FilterSection>

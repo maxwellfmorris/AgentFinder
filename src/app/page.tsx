@@ -16,6 +16,19 @@ const CATEGORIES = [
   { label: 'Travel & Planning', emoji: '✈️', href: '/agents?category=Travel+%26+Planning' },
 ]
 
+const LIFE_STAGE_CHIPS = [
+  { label: 'Parents', emoji: '👨‍👩‍👧' },
+  { label: 'Students', emoji: '🎓' },
+  { label: 'Renters', emoji: '🏠' },
+  { label: 'Job Seekers', emoji: '💼' },
+  { label: 'Caregivers', emoji: '🤝' },
+  { label: 'Travelers', emoji: '✈️' },
+  { label: 'Creators', emoji: '🎨' },
+  { label: 'Hobbyists', emoji: '🔧' },
+  { label: 'Couples', emoji: '💑' },
+  { label: 'Quantified-Self', emoji: '📊' },
+]
+
 export default async function HomePage() {
   const homepageFeatured = await getFeaturedAgents({ tier: 'homepage', limit: 3 })
 
@@ -96,6 +109,23 @@ export default async function HomePage() {
               <span className="text-xs font-semibold text-slate-700 group-hover:text-indigo-700 leading-snug">
                 {cat.label}
               </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Life-stage chip row */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 pb-12">
+        <p className="text-sm font-semibold text-slate-500 mb-4">Or browse by who you are</p>
+        <div className="flex flex-wrap gap-2">
+          {LIFE_STAGE_CHIPS.map((chip) => (
+            <Link
+              key={chip.label}
+              href={`/agents?industry=${encodeURIComponent(chip.label)}`}
+              className="inline-flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 text-sm font-medium px-4 py-2 rounded-full hover:border-indigo-300 hover:text-indigo-700 hover:bg-indigo-50 transition-colors"
+            >
+              <span>{chip.emoji}</span>
+              {chip.label}
             </Link>
           ))}
         </div>

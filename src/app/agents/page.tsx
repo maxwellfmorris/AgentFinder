@@ -24,6 +24,7 @@ interface PageProps {
     category?: string | string[]
     pricing?: string | string[]
     integration?: string | string[]
+    industry?: string | string[]
     q?: string
   }
 }
@@ -37,16 +38,17 @@ export default async function AgentsPage({ searchParams }: PageProps) {
   const categories = toArray(searchParams.category)
   const pricingModels = toArray(searchParams.pricing) as PricingModel[]
   const integrations = toArray(searchParams.integration)
+  const industries = toArray(searchParams.industry)
   const search = searchParams.q
 
   const [agents, categoryFeatured] = await Promise.all([
-    getAgents({ categories, pricingModels, integrations, search }),
+    getAgents({ categories, pricingModels, integrations, industries, search }),
     categories.length > 0
       ? getFeaturedAgents({ tier: 'category', category: categories[0], limit: 3 })
       : Promise.resolve([]),
   ])
 
-  const activeFilterCount = categories.length + pricingModels.length + integrations.length
+  const activeFilterCount = categories.length + pricingModels.length + integrations.length + industries.length
 
   if (search && search.trim()) {
     logSearchEvent({ query: search.trim(), resultCount: agents.length }).catch(() => {})

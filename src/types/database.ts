@@ -211,6 +211,21 @@ export const TIER_COLORS: Record<TrustTier, string> = {
   audited: 'bg-amber-100 text-amber-800',
 }
 
+export const LIFE_STAGE_TAGS = [
+  'Parents',
+  'New Parents',
+  'Students',
+  'Adult Learners',
+  'Renters',
+  'Job Seekers',
+  'Hobbyists',
+  'Creators',
+  'Caregivers',
+  'Travelers',
+  'Couples',
+  'Quantified-Self',
+] as const
+
 export const POPULAR_INTEGRATIONS = [
   'Gmail',
   'Outlook',

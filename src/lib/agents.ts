@@ -119,6 +119,7 @@ export interface AgentFilters {
   categories?: string[]
   pricingModels?: PricingModel[]
   integrations?: string[]
+  industries?: string[]
   search?: string
 }
 
@@ -137,6 +138,9 @@ export async function getAgents(filters: AgentFilters = {}): Promise<Agent[]> {
     }
     if (filters.pricingModels?.length) {
       query = query.in('pricing_model', filters.pricingModels)
+    }
+    if (filters.industries?.length) {
+      query = query.overlaps('industry_tags', filters.industries)
     }
     if (filters.search) {
       query = query.textSearch('search_vector', filters.search, {
@@ -225,6 +229,11 @@ function filterLocally(agents: Agent[], filters: AgentFilters): Agent[] {
   if (filters.integrations?.length) {
     results = results.filter((a) =>
       filters.integrations!.some((i) => a.platform_integrations.includes(i))
+    )
+  }
+  if (filters.industries?.length) {
+    results = results.filter((a) =>
+      filters.industries!.some((i) => a.industry_tags.includes(i))
     )
   }
   if (filters.search) {
