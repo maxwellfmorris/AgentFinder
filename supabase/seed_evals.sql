@@ -22,6 +22,3 @@ insert into agent_evals (agent_id, benchmark_name, score, sample_size, notes, ev
 select id, 'SQL-Accuracy-v3', 76.00, 300, null, now(), 'agentfinder'
 from agents where slug = 'data-narrator';
 
-insert into agent_evals (agent_id, benchmark_name, score, sample_size, notes, evaluated_at, verified_by)
-select id, 'ChurnPrediction-AUC', 54.00, 90, null, now(), 'self_reported'
-from agents where slug = 'clientpulse';
