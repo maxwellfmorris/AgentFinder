@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight, CheckCircle, Star, Zap, Shield } from 'lucide-react'
-import { PLACEHOLDER_AGENTS, getFeaturedAgents } from '@/lib/agents'
+import { getAgents, getFeaturedAgents } from '@/lib/agents'
 import { AgentCard } from '@/components/AgentCard'
 import { HomeSearch } from '@/components/HomeSearch'
 import { isFeatured } from '@/types/database'
@@ -32,15 +32,13 @@ const LIFE_STAGE_CHIPS = [
 export default async function HomePage() {
   const homepageFeatured = await getFeaturedAgents({ tier: 'homepage', limit: 3 })
 
-  // Supplement with top-rated placeholders until we have 3 cards
+  // Supplement with other published agents until we have 3 cards
   const featuredIds = new Set(homepageFeatured.map((a) => a.id))
-  const topRated = PLACEHOLDER_AGENTS.filter(
-    (a) => ['verified', 'vetted', 'audited'].includes(a.trust_tier) && !featuredIds.has(a.id)
-  )
+  const others = (await getAgents()).filter((a) => !featuredIds.has(a.id))
 
   const displayAgents: Array<{ agent: Agent; sponsored: boolean }> = [
     ...homepageFeatured.map((a) => ({ agent: a, sponsored: true })),
-    ...topRated.map((a) => ({ agent: a, sponsored: false })),
+    ...others.map((a) => ({ agent: a, sponsored: false })),
   ].slice(0, 3)
 
   return (
@@ -135,7 +133,7 @@ export default async function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold text-slate-900">
-            Top-rated agents this month
+            A few to get you started
           </h2>
           <Link href="/agents" className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
             See all <ArrowRight size={14} />
