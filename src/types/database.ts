@@ -114,6 +114,16 @@ export interface SearchEvent {
   position: number | null
 }
 
+export interface Feedback {
+  id: string
+  created_at: string
+  message: string
+  email: string | null
+  page_path: string | null
+  session_id: string
+  user_id: string | null
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -145,6 +155,12 @@ export type Database = {
         Row: SearchEvent & Record<string, unknown>
         Insert: Omit<SearchEvent, 'id' | 'created_at'> & Record<string, unknown>
         Update: Partial<Omit<SearchEvent, 'id' | 'created_at'>> & Record<string, unknown>
+        Relationships: []
+      }
+      feedback: {
+        Row: Feedback & Record<string, unknown>
+        Insert: Omit<Feedback, 'id' | 'created_at'> & Record<string, unknown>
+        Update: Partial<Omit<Feedback, 'id' | 'created_at'>> & Record<string, unknown>
         Relationships: []
       }
     }
