@@ -98,7 +98,8 @@ export function SubmitForm() {
         </div>
         <h2 className="text-xl font-bold text-slate-900 mb-2">Submission received!</h2>
         <p className="text-slate-500 mb-6">
-          We&apos;ll review your agent and reach out within 3–5 business days.
+          Your agent is in the review queue. Once it&apos;s approved, it&apos;ll appear in the
+          catalog — you can track its status anytime on your dashboard.
         </p>
         <button
           onClick={() => setStatus('idle')}

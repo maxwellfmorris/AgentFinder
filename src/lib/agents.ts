@@ -24,6 +24,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     submitted_by_user_id: null,
     featured_until: null,
     featured_tier: 'none' as FeaturedTier,
+    status: 'published',
   },
   {
     id: '2',
@@ -46,6 +47,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     submitted_by_user_id: null,
     featured_until: null,
     featured_tier: 'none' as FeaturedTier,
+    status: 'published',
   },
   {
     id: '3',
@@ -68,6 +70,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     submitted_by_user_id: null,
     featured_until: null,
     featured_tier: 'none' as FeaturedTier,
+    status: 'published',
   },
   {
     id: '4',
@@ -90,6 +93,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     submitted_by_user_id: null,
     featured_until: null,
     featured_tier: 'none' as FeaturedTier,
+    status: 'published',
   },
   {
     id: '5',
@@ -112,6 +116,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     submitted_by_user_id: null,
     featured_until: null,
     featured_tier: 'none' as FeaturedTier,
+    status: 'published',
   },
 ]
 
@@ -131,7 +136,11 @@ export async function getAgents(filters: AgentFilters = {}): Promise<Agent[]> {
   }
 
   try {
-    let query = supabase.from('agents').select('*').order('review_count', { ascending: false })
+    let query = supabase
+      .from('agents')
+      .select('*')
+      .eq('status', 'published')
+      .order('review_count', { ascending: false })
 
     if (filters.categories?.length) {
       query = query.in('category', filters.categories)
@@ -179,6 +188,7 @@ export async function getAgentBySlug(slug: string): Promise<Agent | null> {
       .from('agents')
       .select('*')
       .eq('slug', slug)
+      .eq('status', 'published')
       .single()
 
     if (error || !data) return null
@@ -201,6 +211,7 @@ export async function getFeaturedAgents(opts: {
       .from('agents')
       .select('*')
       .eq('featured_tier', opts.tier)
+      .eq('status', 'published')
       .gt('featured_until', new Date().toISOString())
       .order('featured_until', { ascending: false })
       .limit(opts.limit)

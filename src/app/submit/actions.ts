@@ -234,6 +234,7 @@ export async function submitAgent(formData: FormData): Promise<SubmitResult> {
     pricing_model,
     setup_complexity,
     trust_tier: 'listed',
+    status: 'pending',
     average_rating: null,
     review_count: 0,
     submitted_by_user_id,

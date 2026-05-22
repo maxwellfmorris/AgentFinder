@@ -55,13 +55,29 @@ export default async function DashboardPage() {
       ) : (
         <div className="space-y-6">
           {cardData.map(({ agent, stats, evals, sparkline }) => (
-            <DashboardCard
-              key={agent.id}
-              agent={agent}
-              stats={stats}
-              evals={evals}
-              sparkline={sparkline}
-            />
+            <div key={agent.id}>
+              <div className="mb-2">
+                {agent.status === 'published' ? (
+                  <span className="inline-flex items-center text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+                    Published · live in the catalog
+                  </span>
+                ) : agent.status === 'pending' ? (
+                  <span className="inline-flex items-center text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                    Pending review · not yet public
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center text-xs font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full">
+                    Not approved
+                  </span>
+                )}
+              </div>
+              <DashboardCard
+                agent={agent}
+                stats={stats}
+                evals={evals}
+                sparkline={sparkline}
+              />
+            </div>
           ))}
         </div>
       )}

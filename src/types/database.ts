@@ -2,6 +2,7 @@ export type PricingModel = 'free' | 'freemium' | 'subscription' | 'usage_based' 
 export type SetupComplexity = 'plug_and_play' | 'low' | 'medium' | 'high'
 export type TrustTier = 'listed' | 'verified' | 'vetted' | 'audited'
 export type FeaturedTier = 'none' | 'category' | 'homepage'
+export type AgentStatus = 'pending' | 'published' | 'rejected'
 
 export interface Agent {
   id: string
@@ -23,6 +24,7 @@ export interface Agent {
   submitted_by_user_id: string | null
   featured_until: string | null
   featured_tier: FeaturedTier
+  status: AgentStatus
 }
 
 export function isFeatured(agent: { featured_until: string | null }): boolean {
