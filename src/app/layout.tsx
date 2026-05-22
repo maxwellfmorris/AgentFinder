@@ -6,23 +6,23 @@ import { AuthProvider } from '@/components/AuthProvider'
 
 export const metadata: Metadata = {
   title: {
-    default: 'AgentFinder — Discover AI Agents for Your Business',
+    default: 'AgentFinder — Find AI Agents That Fit Your Life',
     template: '%s | AgentFinder',
   },
   description:
-    'Browse, compare, and find the right AI agents for your team. Verified listings and real reviews from business professionals.',
+    'Discover and compare AI agents for everyday life — writing, money, learning, home, health, and travel. Real reviews and honest listings to help you find the right fit.',
   openGraph: {
     siteName: 'AgentFinder',
     type: 'website',
-    title: 'AgentFinder — Discover AI Agents for Your Business',
+    title: 'AgentFinder — Find AI Agents That Fit Your Life',
     description:
-      'Browse, compare, and find the right AI agents for your team. Verified listings and real reviews from business professionals.',
+      'Discover and compare AI agents for everyday life — writing, money, learning, home, health, and travel. Real reviews and honest listings to help you find the right fit.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AgentFinder — Discover AI Agents for Your Business',
+    title: 'AgentFinder — Find AI Agents That Fit Your Life',
     description:
-      'Browse, compare, and find the right AI agents for your team. Verified listings and real reviews from business professionals.',
+      'Discover and compare AI agents for everyday life — writing, money, learning, home, health, and travel. Real reviews and honest listings to help you find the right fit.',
   },
   robots: {
     index: true,

@@ -21,11 +21,11 @@ export function Header() {
             <Link href="/agents?category=Writing+%26+Communication" className="hover:text-indigo-600 transition-colors">
               Writing
             </Link>
-            <Link href="/agents?category=Productivity+%26+Meetings" className="hover:text-indigo-600 transition-colors">
-              Meetings
+            <Link href="/agents?category=Money+%26+Finances" className="hover:text-indigo-600 transition-colors">
+              Money
             </Link>
-            <Link href="/agents?category=Data+%26+Analytics" className="hover:text-indigo-600 transition-colors">
-              Analytics
+            <Link href="/agents?category=Learning+%26+Skills" className="hover:text-indigo-600 transition-colors">
+              Learning
             </Link>
           </nav>
 
