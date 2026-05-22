@@ -27,6 +27,7 @@ Save this file at the repo root. Paste its contents (or point Claude at it) at t
   - `@supabase/ssr 0.10.2` for the cookie-aware server and browser clients
   - `@supabase/supabase-js 2.x` for the simple anon server client
 - **lucide-react** for icons
+- **Deployed on Vercel** (Hobby tier) — production auto-deploys on every push to `main` (GitHub repo `maxwellfmorris/AgentFinder`). Two env vars set in Vercel: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Supabase is the hosted cloud project; migrations are run in its SQL editor. Live on the default `*.vercel.app` URL — a custom domain is owned but intentionally not connected yet.
 - **No third-party** charting library, no third-party analytics SDK (PostHog, Mixpanel, Vercel Analytics, etc.). Everything telemetry-shaped lives in Supabase.
 - **No LLM dependencies** in the codebase. Lexical search uses Postgres FTS. LLM-classified search is on the roadmap but not built.
 
@@ -35,7 +36,7 @@ Save this file at the repo root. Paste its contents (or point Claude at it) at t
 - **Repo path:** `/Users/sheamccusker/Desktop/MFMs Junk/VibeCoders/AgentFinder/` — must not contain an apostrophe. Next.js's metadata-route webpack loader doesn't escape apostrophes when interpolating absolute paths into error-message string literals, which breaks `npm run build`. (The folder was renamed from `MFM's Junk` → `MFMs Junk` to fix this.)
 - **Dev server port:** usually `3000`. If a stale process is squatting, Next picks `3001`. Clean up with `lsof -ti:3000,3001 | xargs kill -9` from a separate terminal.
 - **Supabase CLI is not wired up.** All migrations are applied manually by the user pasting SQL into the Supabase dashboard's SQL editor.
-- **The user is a non-developer** running Claude Code locally. They paste structured prompts into Claude Code, run them, and commit via terminal. They prefer SQL pasted inline in chat over opening files.
+- **The user is a non-developer.** Recent work is done in Cowork: Claude edits the repo files directly and verifies with `npx tsc --noEmit` + `npx next lint` before handing off. The user then runs any SQL in the Supabase SQL editor and commits/pushes via their own terminal (push auto-deploys to Vercel). They prefer SQL pasted inline in chat, and clear labeling of which tool a command belongs in (Terminal vs Supabase) — conflating the two has caused errors.
 - **Sandbox git quirk:** when Claude runs git operations from its sandbox, write conflicts sometimes leave a stale `.git/index.lock` file behind. The user clears it with `rm -f .git/index.lock` from their own terminal before retrying the commit.
 
 ---
@@ -56,9 +57,13 @@ src/
 │   │   ├── page.tsx                   # /submit shell
 │   │   ├── SubmitForm.tsx             # Smart import + 12-field manual form, controlled state for prefillable fields
 │   │   └── actions.ts                 # submitAgent server action + prefillFromUrl server action (HTML scrape + SSRF defense)
-│   └── dashboard/
-│       ├── page.tsx                   # /dashboard — async server component, gated by AuthProvider
-│       └── feature-actions.ts         # purchaseFeature server action (auth + ownership check, sets featured_until/featured_tier)
+│   ├── dashboard/
+│   │   ├── page.tsx                   # /dashboard — async server component, gated by AuthProvider; shows per-listing status badge (pending/published)
+│   │   └── feature-actions.ts         # purchaseFeature server action (auth + ownership check, sets featured_until/featured_tier)
+│   └── feedback/
+│       ├── page.tsx                   # /feedback — beta feedback page (linked in footer)
+│       ├── FeedbackForm.tsx           # Client form: message + optional email; captures document.referrer as page_path
+│       └── actions.ts                 # submitFeedback server action → feedback table
 ├── components/
 │   ├── Header.tsx                     # Server component, includes NavAuthLinks for auth-aware nav
 │   ├── NavAuthLinks.tsx               # Client island — renders the "Dashboard" link only when authed
@@ -91,10 +96,10 @@ src/
 
 supabase/
 ├── schema.sql                         # Canonical fresh-clone schema — kept in sync with migrations
-├── seed.sql                           # Canonical 14-agent consumer catalog (idempotent via ON CONFLICT)
-├── seed_evals.sql                     # 5 sample evals for Draftly/MeetingMind/DataNarrator
-├── seed_tasks.sql                     # 7 sample Quick Tasks for Draftly/MeetingMind/DataNarrator
-└── migrations/                        # 12 numbered migrations, applied in order
+├── seed.sql                           # OLD fictional 14-agent catalog — stale; live catalog is the 12 real agents (migration 0014). Don't re-run on prod.
+├── seed_evals.sql                     # Sample evals for fictional agents — stale (those agents were deleted in 0015)
+├── seed_tasks.sql                     # Sample Quick Tasks for fictional agents — stale (those agents were deleted in 0015)
+└── migrations/                        # 16 numbered migrations, applied in order
     ├── 0000_reviews_table.sql         # The reviews table (originally created in dashboard, captured here)
     ├── 0001_review_rating_trigger.sql # Trigger that recomputes agents.average_rating/review_count on review change
     ├── 0002_trust_tier.sql            # Replaces `verified bool` with `trust_tier` enum
@@ -106,7 +111,11 @@ supabase/
     ├── 0008_search_events.sql         # Telemetry table for both 'search' and 'click' event types
     ├── 0009_agents_search_vector.sql  # Generated tsvector column for Postgres FTS; drops the old functional index
     ├── 0010_remap_categories.sql      # Best-effort remap of business categories to consumer categories
-    └── 0011_consumer_catalog.sql      # Catalog migration: deletes 10 business agents, retags 8 dual-use, inserts 6 new
+    ├── 0011_consumer_catalog.sql      # Catalog migration: deletes 10 business agents, retags 8 dual-use, inserts 6 new
+    ├── 0012_feedback.sql              # Beta feedback table + public-insert RLS
+    ├── 0013_agent_status.sql          # Moderation gate: status column (pending/published/rejected); backfills existing → published
+    ├── 0014_real_agents_seed.sql      # Seeds 12 real consumer AI products (published, trust_tier listed, no ratings)
+    └── 0015_remove_fictional_agents.sql # Deletes the 14 fictional example.com seed agents
 ```
 
 ---
@@ -115,11 +124,12 @@ supabase/
 
 ### Database tables (Supabase Postgres)
 
-- **agents** — the catalog. Public-read, public-insert via /submit. Key columns: `id`, `slug` (unique), `name`, `tagline`, `description`, `category` (text matching `CATEGORIES` enum in TS), `industry_tags` text[] (life-stage tags), `platform_integrations` text[], `pricing_model` enum, `setup_complexity` enum, `trust_tier` enum, `average_rating` numeric(3,2), `review_count` int, `submitted_by_user_id` uuid FK auth.users, `featured_until` timestamptz, `featured_tier` text, `search_vector` tsvector (generated column).
+- **agents** — the catalog. Public-read (the app's read helpers expose only `status='published'` rows), public-insert via /submit (new submissions land as `pending`). Key columns: `id`, `slug` (unique), `name`, `tagline`, `description`, `category` (text matching `CATEGORIES` enum in TS), `industry_tags` text[] (life-stage tags), `platform_integrations` text[], `pricing_model` enum, `setup_complexity` enum, `trust_tier` enum, `average_rating` numeric(3,2), `review_count` int, `submitted_by_user_id` uuid FK auth.users, `featured_until` timestamptz, `featured_tier` text, `status` text ('pending'|'published'|'rejected', default 'pending'; migration 0013), `search_vector` tsvector (generated column).
 - **reviews** — public-read, owner-write RLS. Columns include `agent_id`, `user_id`, `user_email`, `rating` (1-5), `body`, `usage_claim` ('paying'|'free_trial'|'evaluating'|'none'), `months_used`. Trigger recomputes `agents.average_rating` and `agents.review_count` on any change.
 - **agent_evals** — public-read RLS. Stores standardized benchmark scores per agent: `benchmark_name`, `score` (0-100), `sample_size`, `notes`, `verified_by` ('self_reported'|'agentfinder'|'third_party'). Letter grade is computed in TS via `getLetterGrade()`, NOT stored.
 - **agent_tasks** — public-read RLS. Quick Tasks SKUs: `title`, `description`, `price_usd`, `expected_duration_minutes`, `available` bool. Partial index on `(agent_id) where available = true`.
 - **search_events** — public-insert RLS, no select policy (reads happen via SQL editor). Both 'search' and 'click' event types in one wide-nullables table. Foreign-keyed to agents on delete cascade.
+- **feedback** — beta feedback. Public-insert RLS, no select policy (reads via SQL editor). Columns: `message`, `email` (nullable), `page_path` (nullable, captured from `document.referrer`), `session_id`, `user_id` (nullable FK auth.users on delete set null). Written by the `submitFeedback` server action from `/feedback`. Migration 0012.
 
 ### Three Supabase clients
 
@@ -145,6 +155,14 @@ The cookie-set/setAll plumbing in `supabase-server.ts` includes an empty try/cat
 - `getAgents({ search: q })` in `lib/agents.ts` calls `.textSearch('search_vector', q, { type: 'plain', config: 'english' })`.
 - The dev fallback (`filterLocally`) uses a tokenize + naive plural-stripping heuristic to approximate the same behavior.
 - **Known stemmer blind spot:** Snowball stems "summarize" → `summar` and "summary" → `summari` — different stems. So `?q=summarize+meetings` returns no results even though MeetingMind has "summary" in its description. **This is accepted, not a bug.** The empty-result rows in `search_events` are the data point that will justify upgrading to LLM-classified search later.
+
+### Moderation gate (submission review)
+
+Self-submitted agents do not auto-publish. `agents.status` is `'pending' | 'published' | 'rejected'`, defaulting to `pending` for new submissions (migration `0013`, which backfilled all pre-existing agents to `published`). The public read helpers in `lib/agents.ts` (`getAgents`, `getAgentBySlug`, `getFeaturedAgents`) all filter `.eq('status', 'published')`, so a pending agent never appears in browse, search, on detail pages, on the homepage, or in the sitemap. The owner dashboard query is intentionally NOT status-filtered — submitters see their own pending listings with a status badge. Approval is **manual**: flip `status` to `'published'` via SQL. The `/submit` success copy says the agent is "in the review queue," not live.
+
+### Feedback
+
+`/feedback` (linked in the footer) is a beta feedback channel. `FeedbackForm.tsx` (client) collects a message + optional email and captures `document.referrer` as `page_path`; the `submitFeedback` server action writes to the `feedback` table with the session id and (if signed in) user id. Same RLS-public-insert, swallow-errors pattern as telemetry. Read submissions via the Supabase SQL editor.
 
 ### Trust ladder
 
@@ -249,27 +267,32 @@ Phase 3 will add an `affiliate_url` column on agents and update outbound CTAs to
 - **Quick Tasks (P7)** — pre-priced atomic SKUs, rendered as a section inside the main agent card on detail pages. Outbound link with UTM tracking, no payment infrastructure yet.
 - **Search + telemetry (P8)** — task-driven HomeSearch on the homepage, Postgres FTS via tsvector, search-event and click-event logging via the cookie-based session.
 - **Consumer pivot (Phase 1 / 2a / 2b / 2c)** — voice, taxonomy, catalog, and life-stage UI all consumer-shaped.
+- **Live deployment (Week 1)** — deployed on Vercel, auto-deploying from `main`. Submit flow + RLS verified in production.
+- **Feedback path (Week 1)** — `/feedback` page, footer link, `feedback` table.
+- **Moderation gate (Week 2)** — `status` column; public reads gated to `published`; submissions land `pending`; dashboard shows per-listing status; submit copy reflects review.
+- **Real catalog (Week 2)** — 12 real, current consumer AI products seeded (`published`, `listed` tier, no fabricated ratings); all 14 fictional placeholders removed; homepage now pulls real published agents.
+- **Pivot cleanup (Week 2)** — site metadata refreshed to consumer voice; dead "Meetings"/"Analytics" header nav links repointed to live categories (Money, Learning).
 
-### Current catalog (14 agents)
+### Current catalog (12 real agents)
 
-| Slug | Name | Category | Trust tier |
+All seeded `trust_tier: listed`, `status: published`, `average_rating: null`, `review_count: 0` (no fabricated ratings on real products — they earn reviews over time). Logos are neutral DiceBear placeholders, not the companies' real logos (avoids implying endorsement). Descriptions are original, written from each product's public site.
+
+| Slug | Name | Category | Pricing |
 |---|---|---|---|
-| draftly | Draftly | Writing & Communication | (from seed) |
-| meetingmind | MeetingMind | Writing & Communication | (from seed) |
-| brief-bot | BriefBot | Writing & Communication | (from seed) |
-| agenda-ai | AgendaAI | Writing & Communication | (from seed) |
-| recap-ai | RecapAI | Writing & Communication | (from seed) |
-| reply-right | ReplyRight | Writing & Communication | (from seed) |
-| data-narrator | DataNarrator | Money & Finances | (from seed) |
-| budget-sense | BudgetSense | Money & Finances | verified |
-| meal-mate | MealMate | Home & Family | verified |
-| day-pulse | DayPulse | Health & Wellness | vetted |
-| content-cal-ai | ContentCalAI | Hobbies & Creative | (from seed) |
-| pixel-muse | PixelMuse | Hobbies & Creative | verified |
-| tutorly | Tutorly | Learning & Skills | verified |
-| journie | Journie | Travel & Planning | verified |
+| grammarly | Grammarly | Writing & Communication | freemium |
+| wordtune | Wordtune | Writing & Communication | freemium |
+| khanmigo | Khanmigo | Learning & Skills | freemium |
+| duolingo | Duolingo | Learning & Skills | freemium |
+| cleo | Cleo | Money & Finances | freemium |
+| copilot-money | Copilot Money | Money & Finances | subscription |
+| ohai-ai | Ohai.ai | Home & Family | subscription |
+| samsung-food | Samsung Food | Home & Family | freemium |
+| wysa | Wysa | Health & Wellness | freemium |
+| midjourney | Midjourney | Hobbies & Creative | subscription |
+| suno | Suno | Hobbies & Creative | freemium |
+| mindtrip | Mindtrip | Travel & Planning | freemium |
 
-**These are placeholder/fictional agents.** Real launch needs deciding which 3-5 real products to list — they'll need affiliate programs and accurate descriptions.
+Full descriptions/taglines live in `REAL_AGENTS_DRAFT.md` at the repo root. Listing real products needs no permission (nominative fair use); *monetizing* via affiliate requires joining each product's program (a Phase 3 step). Health & Wellness and Travel currently have one agent each — candidates for a second.
 
 ### Current categories (7)
 
@@ -281,6 +304,7 @@ Phase 3 will add an `affiliate_url` column on agents and update outbound CTAs to
 
 ### What's next (not yet built)
 
+- **Week 3 — Bold visual redesign (active next step).** The aesthetic is intentionally simple; the user's instinct is that it needs to be more eye-catching. The plan: Claude mocks 2-3 distinct homepage directions as inline visuals, the user picks one, we establish a design system (type / color / spacing / one signature motif), then carry it through browse + detail. This is the immediate next focus, ahead of Phase 3.
 - **Phase 3 — Affiliate-link infrastructure.** Add `affiliate_url` column to agents, update outbound CTAs ("Visit Website" on detail pages, "Run this task" in Quick Tasks) to use the affiliate URL when present, log click-throughs with affiliate attribution. The load-bearing piece that turns the consumer pivot into actual revenue.
 - **Phase 4 — Comparison surface.** Side-by-side compare page, "vs alternatives" link on detail pages. Higher value with the AI-curious cohort.
 - **Phase 5 — SEO + editorial content.** Programmatic `/best/{category}` pages, write-ups. Bigger lift.
@@ -290,26 +314,29 @@ Phase 3 will add an `affiliate_url` column on agents and update outbound CTAs to
 
 - `schema.sql`'s top drop-list is missing entries for `agent_tasks`, `agent_evals`, `search_events`. Fresh-clone bootstrap from `schema.sql` alone would fail to drop those tables before recreating. Cosmetic; the migrations are the operational source of truth.
 - `AuthProvider.tsx`, `ReviewsList.tsx`, `SignInModal.tsx` each have a single `react-hooks/exhaustive-deps` warning. Pre-existing, non-blocking. Worth a cleanup pass eventually.
-- `PLACEHOLDER_AGENTS` in `lib/agents.ts` has only 5 entries (Draftly / BudgetSense / MealMate / DayPulse / Journie) for the dev-without-Supabase fallback. The live catalog has 14. Acceptable inconsistency.
+- `PLACEHOLDER_AGENTS` in `lib/agents.ts` still holds the 5 OLD fictional entries (Draftly / BudgetSense / MealMate / DayPulse / Journie). It's now used *only* as the dev-without-Supabase fallback — the homepage no longer displays it. Stale but harmless; worth swapping for a couple of real entries eventually.
 - The smart-import server action does a full `.text()` then `.slice(0, 200 * 1024)` — the body is downloaded entirely before truncation. The 5s timeout is the actual hostile-input protection. Worth switching to streaming if it becomes a hotspot.
 - Two emoji collisions on the homepage are kept *by design* as semantic anchors: 🏠 appears on both the "Home & Family" category tile and the "Renters" chip; ✈️ on both "Travel & Planning" and "Travelers". Documented and accepted.
-- Of the 10 life-stage chips on the homepage, 3 are sparse (Job Seekers: 1 agent, Couples: 1 agent, Quantified-Self: 3 agents). Not a bug; growth will fill them in.
+- Life-stage chip coverage shifted with the new real catalog (per-chip agent counts are no longer those in this doc). Some chips match few or no agents until the catalog grows. Not a bug.
+- The homepage "A few to get you started" row shows the first 3 published agents by `review_count` desc — with every real agent at 0 reviews, that ordering is effectively arbitrary for now. Fine until there are real ratings or curated featured picks.
 
 ### Working rhythm
 
-The user works by:
-1. Asking strategic questions ("how should we pivot?", "what's the right buyer-side experience?") and wanting a thinking-partner conversation, not immediate code.
-2. Once we agree on direction, they ask for a "prompt" — a structured spec they paste into Claude Code locally.
-3. Claude Code generates the changes. The user reports "done" or "completed".
-4. Claude (me) verifies by reading the diff via `git diff HEAD`. Spots constraint violations, design drift, or correctness bugs.
-5. Claude pastes any SQL migrations inline in chat (the user can't easily open SQL files locally).
-6. The user applies SQL to live Supabase via the dashboard's SQL editor.
-7. The user runs a smoke test (often just visual + an SQL `SELECT`), then commits via terminal with a detailed message Claude provides.
+The recent working loop (in Cowork):
+1. The user brings a strategic question or a goal; we align on direction first — often via multiple-choice clarifying questions — before any code.
+2. Claude edits the repo files directly (Read/Write/Edit), keeping changes small and matching existing patterns.
+3. Claude verifies every change with `npx tsc --noEmit` and `npx next lint --file ...` before handing off — both must be clean (unescaped apostrophes in JSX and unused imports will fail the Vercel build).
+4. Claude pastes any SQL migration inline in chat, clearly labeled "in the Supabase SQL editor," for the user to run.
+5. Claude gives exact `git` commands, clearly labeled "in your Terminal," to commit + push; pushing auto-deploys to Vercel.
+6. The user runs a smoke test (visual + an SQL `SELECT`) and reports back; Claude marks the step done.
+
+(Earlier in the project the loop ran through Claude Code with pasted prompts — that still works, but recent sessions edit directly via Cowork. Claude cannot push from its sandbox; the user always runs git from their own terminal.)
 
 **Cadence preferences:**
-- Prompts are kept small and focused. Single-feature prompts that touch 3-8 files. Big multi-feature prompts are split into a/b/c subprompts.
-- Verification is fast and concrete. "Done when" criteria are grep-checkable or smoke-testable in under 2 minutes.
-- Commits happen after each verified prompt with a detailed multi-line message. The user pushes to GitHub occasionally for backup.
+- One reviewable step at a time; the user often says "slow and steady." Big changes are split into sub-steps, each verified before the next.
+- Commands are labeled by tool (Terminal vs Supabase) — conflating them has caused errors (e.g. pasting a `cat … | pbcopy` line into the SQL editor).
+- Destructive actions (deletes, drops) are confirmed before running.
+- A running task list tracks multi-step work so the user can see progress.
 
 ---
 
