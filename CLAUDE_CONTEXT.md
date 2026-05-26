@@ -79,7 +79,8 @@ src/
 │   ├── HomeSearch.tsx                 # Task-driven search input on the homepage
 │   ├── SearchBar.tsx                  # The search box on /agents (separate from HomeSearch)
 │   ├── SearchResultLink.tsx           # Wraps AgentCard for click-event logging on search-result clicks
-│   ├── FilterSidebar.tsx              # Category / Pricing / For Who / Works With checkboxes
+│   ├── FilterSidebar.tsx              # Category / Pricing / For Who / Works With checkboxes (desktop sidebar + reused inside MobileFilters)
+│   ├── MobileFilters.tsx             # Mobile-only "Filters" button + slide-in drawer wrapping FilterSidebar (lg:hidden); shows active-count badge
 │   ├── DashboardCard.tsx              # Submitter-dashboard card: header, stats grid, sparkline, diagnostics
 │   ├── DashboardSignInGate.tsx        # Unauthenticated /dashboard view
 │   └── HowToClimbModal.tsx            # Modal listing all 4 trust tiers, current one highlighted
@@ -96,10 +97,10 @@ src/
 
 supabase/
 ├── schema.sql                         # Canonical fresh-clone schema — kept in sync with migrations
-├── seed.sql                           # OLD fictional 14-agent catalog — stale; live catalog is the 12 real agents (migration 0014). Don't re-run on prod.
+├── seed.sql                           # OLD fictional 14-agent catalog — stale; live catalog is the 18 real agents (migrations 0014 + 0016). Don't re-run on prod.
 ├── seed_evals.sql                     # Sample evals for fictional agents — stale (those agents were deleted in 0015)
 ├── seed_tasks.sql                     # Sample Quick Tasks for fictional agents — stale (those agents were deleted in 0015)
-└── migrations/                        # 16 numbered migrations, applied in order
+└── migrations/                        # 17 numbered migrations, applied in order
     ├── 0000_reviews_table.sql         # The reviews table (originally created in dashboard, captured here)
     ├── 0001_review_rating_trigger.sql # Trigger that recomputes agents.average_rating/review_count on review change
     ├── 0002_trust_tier.sql            # Replaces `verified bool` with `trust_tier` enum
@@ -115,7 +116,8 @@ supabase/
     ├── 0012_feedback.sql              # Beta feedback table + public-insert RLS
     ├── 0013_agent_status.sql          # Moderation gate: status column (pending/published/rejected); backfills existing → published
     ├── 0014_real_agents_seed.sql      # Seeds 12 real consumer AI products (published, trust_tier listed, no ratings)
-    └── 0015_remove_fictional_agents.sql # Deletes the 14 fictional example.com seed agents
+    ├── 0015_remove_fictional_agents.sql # Deletes the 14 fictional example.com seed agents
+    └── 0016_health_travel_agents.sql  # Adds 6 real agents to round out Health & Wellness (Ada Health, WHOOP, Headspace) + Travel (Hopper, GuideGeek, Wanderlog)
 ```
 
 ---
@@ -270,10 +272,11 @@ Phase 3 will add an `affiliate_url` column on agents and update outbound CTAs to
 - **Live deployment (Week 1)** — deployed on Vercel, auto-deploying from `main`. Submit flow + RLS verified in production.
 - **Feedback path (Week 1)** — `/feedback` page, footer link, `feedback` table.
 - **Moderation gate (Week 2)** — `status` column; public reads gated to `published`; submissions land `pending`; dashboard shows per-listing status; submit copy reflects review.
-- **Real catalog (Week 2)** — 12 real, current consumer AI products seeded (`published`, `listed` tier, no fabricated ratings); all 14 fictional placeholders removed; homepage now pulls real published agents.
+- **Real catalog (Week 2)** — 12 real, current consumer AI products seeded (`published`, `listed` tier, no fabricated ratings); all 14 fictional placeholders removed; homepage now pulls real published agents. Later expanded to **18** via migration 0016 (6 added to the two thinnest categories).
 - **Pivot cleanup (Week 2)** — site metadata refreshed to consumer voice; dead "Meetings"/"Analytics" header nav links repointed to live categories (Money, Learning).
+- **Mobile filtering** — Browse (`/agents`) filter sidebar is `hidden lg:block`; on mobile a `MobileFilters` "Filters" button + slide-in drawer (reusing `FilterSidebar`) exposes the full filter set. Resolves the old gap where phone users could only keyword-search.
 
-### Current catalog (12 real agents)
+### Current catalog (18 real agents)
 
 All seeded `trust_tier: listed`, `status: published`, `average_rating: null`, `review_count: 0` (no fabricated ratings on real products — they earn reviews over time). Logos are neutral DiceBear placeholders, not the companies' real logos (avoids implying endorsement). Descriptions are original, written from each product's public site.
 
@@ -288,11 +291,17 @@ All seeded `trust_tier: listed`, `status: published`, `average_rating: null`, `r
 | ohai-ai | Ohai.ai | Home & Family | subscription |
 | samsung-food | Samsung Food | Home & Family | freemium |
 | wysa | Wysa | Health & Wellness | freemium |
+| ada-health | Ada Health | Health & Wellness | free |
+| whoop | WHOOP | Health & Wellness | subscription |
+| headspace | Headspace | Health & Wellness | subscription |
 | midjourney | Midjourney | Hobbies & Creative | subscription |
 | suno | Suno | Hobbies & Creative | freemium |
 | mindtrip | Mindtrip | Travel & Planning | freemium |
+| hopper | Hopper | Travel & Planning | free |
+| guidegeek | GuideGeek | Travel & Planning | free |
+| wanderlog | Wanderlog | Travel & Planning | freemium |
 
-Full descriptions/taglines live in `REAL_AGENTS_DRAFT.md` at the repo root. Listing real products needs no permission (nominative fair use); *monetizing* via affiliate requires joining each product's program (a Phase 3 step). Health & Wellness and Travel currently have one agent each — candidates for a second.
+Full descriptions/taglines for the first 12 live in `REAL_AGENTS_DRAFT.md` at the repo root; the 6 added in 0016 live in that migration file. Listing real products needs no permission (nominative fair use); *monetizing* via affiliate requires joining each product's program (a Phase 3 step). Per-category counts are now: Writing 2, Learning 2, Money 2, Home 2, Health & Wellness 4, Hobbies 2, Travel & Planning 4.
 
 ### Current categories (7)
 
@@ -306,10 +315,11 @@ Full descriptions/taglines live in `REAL_AGENTS_DRAFT.md` at the repo root. List
 
 The aesthetic was intentionally simple; the user wanted it more eye-catching. We mocked 3 homepage directions, the user picked **Direction B (Bold Pop)**, then chose the **B2 "Sunset Pop"** sub-variant as the final look. The system: warm-cream page (`#FFF9F4`), a coral→pink→violet hero gradient (`#FF6B4A → #FF3D77 → #8B2FE6`) with rounded-bottom corners and soft decorative circles, **buttercream `#FFD23D`** as the primary CTA/accent, **Space Grotesk** for display/headlines + **Inter** for body, ink text `#2A1A2E`, and soft pillowy cards (no hard borders; gentle colored shadows; colored top-accent bar). Tokens live in `tailwind.config.ts` (`cream`, `ink`, `coral`, `punch`, `grape`, `butter`, `muted`) + `fontFamily.sans`/`fontFamily.display`; fonts loaded via `next/font` in `layout.tsx`; page bg/foreground in `globals.css`.
 
-Converted surfaces (every page + shared component): homepage, AgentCard, Header/footer, NavAuthLinks, HomeSearch; Browse (`/agents`) + FilterSidebar + SearchBar; detail (`/agents/[slug]`) + ReviewsSection/ReviewForm/ReviewsList/QuickTaskCard/EvalRow/SignInModal; Submit + SubmitForm; Dashboard + DashboardCard/DashboardSignInGate/HowToClimbModal; Feedback + FeedbackForm. **Zero `indigo-*` classes remain in `src/`.** Intentionally kept as semantic (not brand) colors: trust-tier chips (`listed`=neutral slate, `verified`=grape, `vetted`=emerald, `audited`=amber in `TIER_COLORS`), letter-grade colors, pricing/complexity badges, amber rating stars + neutral `slate-200` empty stars, emerald success / red error / amber "promote"/issues states, neutral slate for `enterprise` pricing + "Not approved" status. Also fixed lingering business-voice copy on Browse + Submit (no more "for your team / business professionals"; Submit's old "Industry tags" field is now "Who it's for" with life-stage examples). All changes pass `tsc --noEmit` + `next lint`; **not yet pushed to GitHub/Vercel** as of this writing — awaiting user's deploy.
+Converted surfaces (every page + shared component): homepage, AgentCard, Header/footer, NavAuthLinks, HomeSearch; Browse (`/agents`) + FilterSidebar + SearchBar; detail (`/agents/[slug]`) + ReviewsSection/ReviewForm/ReviewsList/QuickTaskCard/EvalRow/SignInModal; Submit + SubmitForm; Dashboard + DashboardCard/DashboardSignInGate/HowToClimbModal; Feedback + FeedbackForm. **Zero `indigo-*` classes remain in `src/`.** Intentionally kept as semantic (not brand) colors: trust-tier chips (`listed`=neutral slate, `verified`=grape, `vetted`=emerald, `audited`=amber in `TIER_COLORS`), letter-grade colors, pricing/complexity badges, amber rating stars + neutral `slate-200` empty stars, emerald success / red error / amber "promote"/issues states, neutral slate for `enterprise` pricing + "Not approved" status. Also fixed lingering business-voice copy on Browse + Submit (no more "for your team / business professionals"; Submit's old "Industry tags" field is now "Who it's for" with life-stage examples). All changes pass `tsc --noEmit` + `next lint`, and are **shipped to GitHub/Vercel and live**. (Two throwaway mockup files at the repo root — `homepage-redesign-mockups.html`, `homepage-bold-variations.html` — were removed in a cleanup commit.)
 
 ### What's next (not yet built)
 
+- **Mobile category-chips row (optional follow-on).** A horizontal-scroll row of category chips at the top of mobile Browse for one-tap filtering, complementing the existing `MobileFilters` drawer. Discussed, not built.
 - **Phase 3 — Affiliate-link infrastructure.** Add `affiliate_url` column to agents, update outbound CTAs ("Visit Website" on detail pages, "Run this task" in Quick Tasks) to use the affiliate URL when present, log click-throughs with affiliate attribution. The load-bearing piece that turns the consumer pivot into actual revenue.
 - **Phase 4 — Comparison surface.** Side-by-side compare page, "vs alternatives" link on detail pages. Higher value with the AI-curious cohort.
 - **Phase 5 — SEO + editorial content.** Programmatic `/best/{category}` pages, write-ups. Bigger lift.
