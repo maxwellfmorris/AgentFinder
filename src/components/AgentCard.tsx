@@ -27,7 +27,7 @@ const PRICING_COLOR: Record<string, string> = {
 
 export function AgentCard({ agent, onView }: AgentCardProps) {
   return (
-    <div className="group bg-white rounded-3xl overflow-hidden shadow-[0_14px_34px_rgba(139,47,230,0.10)] hover:shadow-[0_20px_44px_rgba(139,47,230,0.16)] hover:-translate-y-0.5 transition-all flex flex-col">
+    <div className="group relative bg-white rounded-3xl overflow-hidden shadow-[0_14px_34px_rgba(139,47,230,0.10)] hover:shadow-[0_20px_44px_rgba(139,47,230,0.16)] hover:-translate-y-0.5 transition-all flex flex-col">
       {/* Signature top accent */}
       <div className="h-1.5 bg-gradient-to-r from-coral via-punch to-grape" />
 
@@ -138,7 +138,8 @@ export function AgentCard({ agent, onView }: AgentCardProps) {
           <Link
             href={`/agents/${agent.slug}`}
             onClick={onView}
-            className="flex-1 text-center text-sm font-bold text-grape border border-grape/30 rounded-full py-2 hover:bg-grape/5 hover:border-grape/50 transition-colors"
+            aria-label={`View details for ${agent.name}`}
+            className="flex-1 text-center text-sm font-bold text-grape border border-grape/30 rounded-full py-2 hover:bg-grape/5 hover:border-grape/50 transition-colors after:absolute after:inset-0 after:content-[''] lg:after:content-none"
           >
             View Details
           </Link>
@@ -147,7 +148,7 @@ export function AgentCard({ agent, onView }: AgentCardProps) {
               href={agent.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-shrink-0 p-2 text-muted hover:text-grape border border-grape/15 rounded-full hover:bg-grape/5 transition-colors"
+              className="relative z-10 flex-shrink-0 p-2 text-muted hover:text-grape border border-grape/15 rounded-full hover:bg-grape/5 transition-colors"
               aria-label={`Visit ${agent.name} website`}
             >
               <ExternalLink size={15} />
