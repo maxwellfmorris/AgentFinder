@@ -107,9 +107,10 @@ export default async function AgentDetailPage({ params }: PageProps) {
 
       <div className="bg-white rounded-2xl border border-grape/10 shadow-[0_8px_20px_rgba(255,107,74,0.06)] overflow-hidden">
         {/* Hero section */}
-        <div className="p-8 border-b border-grape/10">
-          <div className="flex items-start gap-5">
-            <div className="w-20 h-20 rounded-2xl overflow-hidden border border-grape/10 flex-shrink-0">
+        <div className="p-6 sm:p-8 border-b border-grape/10">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
+            <div className="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border border-grape/10 flex-shrink-0">
               {agent.logo_url ? (
                 <Image
                   src={agent.logo_url}
@@ -127,7 +128,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h1 className="font-display text-2xl font-bold text-ink">{agent.name}</h1>
                 <TierChip tier={agent.trust_tier} size="md" />
               </div>
@@ -165,6 +166,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
                   </div>
                 )
               })()}
+              </div>
             </div>
 
             {agent.website && (
@@ -172,7 +174,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
                 href={agent.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-shrink-0 inline-flex items-center gap-2 bg-butter text-ink font-semibold text-sm px-5 py-2.5 rounded-full hover:brightness-105 transition shadow-sm shadow-punch/20"
+                className="flex-shrink-0 inline-flex items-center justify-center gap-2 bg-butter text-ink font-semibold text-sm px-5 py-2.5 rounded-full hover:brightness-105 transition shadow-sm shadow-punch/20 w-full lg:w-auto"
               >
                 Visit Website
                 <ExternalLink size={14} />
