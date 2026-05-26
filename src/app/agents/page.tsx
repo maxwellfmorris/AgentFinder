@@ -4,6 +4,7 @@ import { logSearchEvent } from '@/lib/events'
 import { AgentCard } from '@/components/AgentCard'
 import SearchResultLink from '@/components/SearchResultLink'
 import { FilterSidebar } from '@/components/FilterSidebar'
+import { MobileFilters } from '@/components/MobileFilters'
 import { SearchBar } from '@/components/SearchBar'
 import type { PricingModel } from '@/types/database'
 import type { Metadata } from 'next'
@@ -68,6 +69,13 @@ export default async function AgentsPage({ searchParams }: PageProps) {
       <div className="mb-6">
         <Suspense>
           <SearchBar />
+        </Suspense>
+      </div>
+
+      {/* Mobile filter trigger + drawer (desktop uses the sidebar below) */}
+      <div className="lg:hidden mb-6">
+        <Suspense>
+          <MobileFilters resultCount={agents.length} />
         </Suspense>
       </div>
 
