@@ -22,7 +22,7 @@ function Sparkline({ data }: { data: number[] }) {
   const total = data.reduce((s, v) => s + v, 0)
   if (total < 2) {
     return (
-      <p className="text-xs text-slate-400 italic">
+      <p className="text-xs text-muted/70 italic">
         Sparkline appears once you have multiple reviews
       </p>
     )
@@ -43,7 +43,7 @@ function Sparkline({ data }: { data: number[] }) {
       <polyline
         points={pts}
         fill="none"
-        stroke="rgb(99 102 241)"
+        stroke="rgb(139 47 230)"
         strokeWidth="1.5"
         strokeLinejoin="round"
         strokeLinecap="round"
@@ -120,12 +120,12 @@ export function DashboardCard({ agent, stats, evals, sparkline }: DashboardCardP
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6">
+    <div className="bg-white rounded-2xl border border-grape/10 shadow-[0_8px_20px_rgba(255,107,74,0.06)] p-6">
       {/* Header row */}
       <div className="flex items-start justify-between gap-4 mb-4">
         <Link
           href={`/agents/${agent.slug}`}
-          className="font-bold text-slate-900 hover:text-indigo-600 transition-colors text-lg leading-snug"
+          className="font-display font-bold text-ink hover:text-grape transition-colors text-lg leading-snug"
         >
           {agent.name}
         </Link>
@@ -133,7 +133,7 @@ export function DashboardCard({ agent, stats, evals, sparkline }: DashboardCardP
           <TierChip tier={agent.trust_tier} size="md" />
           <button
             onClick={() => setShowClimb(true)}
-            className="text-xs text-indigo-600 hover:text-indigo-800 transition-colors"
+            className="text-xs text-grape hover:text-punch transition-colors"
           >
             How to climb →
           </button>
@@ -162,18 +162,18 @@ export function DashboardCard({ agent, stats, evals, sparkline }: DashboardCardP
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div>
-          <p className="text-2xl font-bold text-slate-900">{agent.review_count}</p>
-          <p className="text-xs text-slate-400 mt-0.5">reviews</p>
+          <p className="text-2xl font-bold text-ink">{agent.review_count}</p>
+          <p className="text-xs text-muted/70 mt-0.5">reviews</p>
         </div>
         <div>
-          <p className="text-2xl font-bold text-slate-900">
+          <p className="text-2xl font-bold text-ink">
             {stats.verifiedAvg !== null ? stats.verifiedAvg.toFixed(1) : '—'}
           </p>
-          <p className="text-xs text-slate-400 mt-0.5">verified-user avg</p>
+          <p className="text-xs text-muted/70 mt-0.5">verified-user avg</p>
         </div>
         <div>
           {evals.length === 0 ? (
-            <p className="text-2xl font-bold text-slate-400">—</p>
+            <p className="text-2xl font-bold text-muted/60">—</p>
           ) : (
             <div className="flex flex-wrap gap-1 pt-1">
               {evals.map((e) => {
@@ -190,7 +190,7 @@ export function DashboardCard({ agent, stats, evals, sparkline }: DashboardCardP
               })}
             </div>
           )}
-          <p className="text-xs text-slate-400 mt-0.5">latest evals</p>
+          <p className="text-xs text-muted/70 mt-0.5">latest evals</p>
         </div>
       </div>
 

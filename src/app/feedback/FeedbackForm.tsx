@@ -43,29 +43,29 @@ export function FeedbackForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+    <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-grape/10 shadow-[0_8px_20px_rgba(255,107,74,0.06)] p-6 space-y-4">
       <div>
-        <p className="text-sm text-slate-500 mb-2">Your feedback</p>
+        <p className="text-sm text-muted mb-2">Your feedback</p>
         <textarea
           required
           rows={5}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="What's working? What's confusing? What would make this more useful for you?"
-          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+          className="w-full px-4 py-3 bg-cream border border-grape/15 rounded-xl text-sm text-ink placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-grape focus:border-transparent resize-none"
         />
       </div>
 
       <div>
-        <p className="text-sm text-slate-500 mb-2">
-          Email <span className="text-slate-400">(optional, if you&apos;d like a reply)</span>
+        <p className="text-sm text-muted mb-2">
+          Email <span className="text-muted/70">(optional, if you&apos;d like a reply)</span>
         </p>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          className="w-full px-4 py-3 bg-cream border border-grape/15 rounded-xl text-sm text-ink placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-grape focus:border-transparent"
         />
       </div>
 
@@ -74,7 +74,7 @@ export function FeedbackForm() {
       <button
         type="submit"
         disabled={status === 'loading'}
-        className="flex items-center gap-2 bg-indigo-600 text-white font-semibold text-sm px-5 py-2.5 rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-60"
+        className="flex items-center gap-2 bg-grape text-white font-semibold text-sm px-5 py-2.5 rounded-full hover:brightness-110 transition disabled:opacity-60"
       >
         {status === 'loading' ? (
           <><Loader2 size={14} className="animate-spin" /> Sending…</>

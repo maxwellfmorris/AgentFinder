@@ -40,14 +40,14 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <h1 className="text-2xl font-bold text-slate-900 mb-8">Your listings</h1>
+      <h1 className="font-display text-2xl font-bold text-ink mb-8">Your listings</h1>
 
       {cardData.length === 0 ? (
-        <div className="text-center py-16 text-slate-400">
+        <div className="text-center py-16 text-muted">
           <p className="mb-4">You haven&apos;t submitted any listings yet.</p>
           <Link
             href="/submit"
-            className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+            className="text-sm font-semibold text-grape hover:text-punch"
           >
             Submit your first agent →
           </Link>

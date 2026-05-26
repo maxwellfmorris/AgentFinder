@@ -9,7 +9,7 @@ export function NavAuthLinks() {
   return (
     <Link
       href="/dashboard"
-      className="hidden sm:block text-sm font-semibold text-slate-600 border border-slate-200 px-4 py-2 rounded-full hover:border-indigo-300 hover:text-indigo-600 transition-colors"
+      className="hidden sm:block text-sm font-semibold text-muted border border-grape/15 px-4 py-2 rounded-full hover:border-grape/40 hover:text-grape transition-colors"
     >
       Dashboard
     </Link>

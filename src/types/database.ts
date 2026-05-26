@@ -224,7 +224,7 @@ export const TIER_DESCRIPTIONS: Record<TrustTier, string> = {
 
 export const TIER_COLORS: Record<TrustTier, string> = {
   listed: 'bg-slate-100 text-slate-700',
-  verified: 'bg-indigo-100 text-indigo-700',
+  verified: 'bg-grape/10 text-grape',
   vetted: 'bg-emerald-100 text-emerald-700',
   audited: 'bg-amber-100 text-amber-800',
 }

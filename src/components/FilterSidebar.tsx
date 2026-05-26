@@ -62,14 +62,14 @@ export function FilterSidebar() {
   return (
     <aside className="w-full">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="flex items-center gap-2 font-bold text-slate-900 text-sm uppercase tracking-wide">
+        <h2 className="flex items-center gap-2 font-bold text-ink text-sm uppercase tracking-wide">
           <SlidersHorizontal size={15} />
           Filters
         </h2>
         {hasFilters && (
           <button
             onClick={clearAll}
-            className="flex items-center gap-1 text-xs text-indigo-600 font-semibold hover:text-indigo-800"
+            className="flex items-center gap-1 text-xs text-grape font-semibold hover:text-punch"
           >
             <X size={12} />
             Clear all
@@ -104,7 +104,7 @@ export function FilterSidebar() {
 
       {/* Life-stage */}
       <FilterSection title="For Who">
-        <p className="text-xs text-slate-400 mb-2">
+        <p className="text-xs text-muted/70 mb-2">
           Filter by who you are or what life stage you&apos;re in
         </p>
         {LIFE_STAGE_TAGS.map((tag) => (
@@ -119,7 +119,7 @@ export function FilterSidebar() {
 
       {/* Integrations */}
       <FilterSection title="Works With">
-        <p className="text-xs text-slate-400 mb-2">
+        <p className="text-xs text-muted/70 mb-2">
           Filter agents that connect to tools you already use
         </p>
         {POPULAR_INTEGRATIONS.map((int) => (
@@ -137,8 +137,8 @@ export function FilterSidebar() {
 
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="mb-6 pb-6 border-b border-slate-100 last:border-0 last:mb-0">
-      <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">{title}</h3>
+    <div className="mb-6 pb-6 border-b border-grape/10 last:border-0 last:mb-0">
+      <h3 className="text-xs font-bold text-muted uppercase tracking-wider mb-3">{title}</h3>
       <div className="flex flex-col gap-2">{children}</div>
     </div>
   )
@@ -161,13 +161,13 @@ function FilterCheckbox({
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-0.5 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+        className="mt-0.5 w-4 h-4 rounded border-grape/30 text-grape focus:ring-grape cursor-pointer"
       />
       <div>
-        <span className="text-sm text-slate-700 group-hover:text-slate-900 leading-snug">
+        <span className="text-sm text-ink/80 group-hover:text-ink leading-snug">
           {label}
         </span>
-        {sublabel && <p className="text-xs text-slate-400 leading-snug">{sublabel}</p>}
+        {sublabel && <p className="text-xs text-muted/70 leading-snug">{sublabel}</p>}
       </div>
     </label>
   )

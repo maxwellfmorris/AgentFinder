@@ -99,17 +99,17 @@ export default async function AgentDetailPage({ params }: PageProps) {
       {/* Back */}
       <Link
         href="/agents"
-        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-indigo-600 mb-8 font-medium"
+        className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-grape mb-8 font-medium"
       >
         <ArrowLeft size={15} />
         Back to all agents
       </Link>
 
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-grape/10 shadow-[0_8px_20px_rgba(255,107,74,0.06)] overflow-hidden">
         {/* Hero section */}
-        <div className="p-8 border-b border-slate-100">
+        <div className="p-8 border-b border-grape/10">
           <div className="flex items-start gap-5">
-            <div className="w-20 h-20 rounded-2xl overflow-hidden border border-slate-100 flex-shrink-0">
+            <div className="w-20 h-20 rounded-2xl overflow-hidden border border-grape/10 flex-shrink-0">
               {agent.logo_url ? (
                 <Image
                   src={agent.logo_url}
@@ -120,7 +120,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
                   unoptimized
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-slate-300 bg-slate-50">
+                <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-grape/40 bg-cream">
                   {agent.name[0]}
                 </div>
               )}
@@ -128,11 +128,11 @@ export default async function AgentDetailPage({ params }: PageProps) {
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold text-slate-900">{agent.name}</h1>
+                <h1 className="font-display text-2xl font-bold text-ink">{agent.name}</h1>
                 <TierChip tier={agent.trust_tier} size="md" />
               </div>
 
-              <p className="text-slate-600 font-medium mb-3">{agent.tagline}</p>
+              <p className="text-muted font-medium mb-3">{agent.tagline}</p>
 
               {(reviewStats.verifiedCount > 0 || reviewStats.totalCount > 0) && (() => {
                 const primaryAvg = reviewStats.verifiedCount > 0
@@ -154,9 +154,9 @@ export default async function AgentDetailPage({ params }: PageProps) {
                           />
                         ))}
                       </div>
-                      <span className="font-bold text-slate-900">{primaryAvg.toFixed(1)}</span>
+                      <span className="font-bold text-ink">{primaryAvg.toFixed(1)}</span>
                     </div>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-muted/70 mt-0.5">
                       {reviewStats.verifiedCount > 0
                         ? `Verified-user avg · ${reviewStats.verifiedCount} ${reviewStats.verifiedCount === 1 ? 'review' : 'reviews'} · all reviews avg ${reviewStats.totalAvg!.toFixed(1)} (${reviewStats.totalCount} total)`
                         : `${reviewStats.totalCount} reviews — none from verified users yet`
@@ -172,7 +172,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
                 href={agent.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-shrink-0 inline-flex items-center gap-2 bg-indigo-600 text-white font-semibold text-sm px-5 py-2.5 rounded-full hover:bg-indigo-700 transition-colors"
+                className="flex-shrink-0 inline-flex items-center gap-2 bg-butter text-ink font-semibold text-sm px-5 py-2.5 rounded-full hover:brightness-105 transition shadow-sm shadow-punch/20"
               >
                 Visit Website
                 <ExternalLink size={14} />
@@ -183,8 +183,8 @@ export default async function AgentDetailPage({ params }: PageProps) {
 
         {/* Quick Tasks — only rendered when at least one task exists */}
         {tasks.length > 0 && (
-          <div className="p-8 border-b border-slate-100">
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">
+          <div className="p-8 border-b border-grape/10">
+            <h2 className="text-sm font-bold text-muted uppercase tracking-wider mb-4">
               Quick Tasks
             </h2>
             <div className="grid sm:grid-cols-2 gap-3">
@@ -196,18 +196,18 @@ export default async function AgentDetailPage({ params }: PageProps) {
         )}
 
         {/* Details grid */}
-        <div className="grid sm:grid-cols-2 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+        <div className="grid sm:grid-cols-2 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-grape/10">
           {/* About */}
           <div className="p-8">
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">
+            <h2 className="text-sm font-bold text-muted uppercase tracking-wider mb-4">
               About
             </h2>
-            <p className="text-slate-700 leading-relaxed">{agent.description}</p>
+            <p className="text-ink/80 leading-relaxed">{agent.description}</p>
           </div>
 
           {/* Quick facts */}
           <div className="p-8">
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">
+            <h2 className="text-sm font-bold text-muted uppercase tracking-wider mb-4">
               At a Glance
             </h2>
             <dl className="space-y-4">
@@ -219,14 +219,14 @@ export default async function AgentDetailPage({ params }: PageProps) {
                 <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${complexityColor}`}>
                   {COMPLEXITY_LABELS[agent.setup_complexity]}
                 </span>
-                <span className="text-xs text-slate-400 ml-2">
+                <span className="text-xs text-muted/70 ml-2">
                   {COMPLEXITY_DESCRIPTIONS[agent.setup_complexity]}
                 </span>
               </Fact>
 
               <Fact icon={<Shield size={15} />} label="Trust">
                 <TierChip tier={agent.trust_tier} size="md" />
-                <span className="text-xs text-slate-400 ml-2">
+                <span className="text-xs text-muted/70 ml-2">
                   {TIER_DESCRIPTIONS[agent.trust_tier]}
                 </span>
               </Fact>
@@ -241,7 +241,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
                     {agent.industry_tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full"
+                        className="text-xs bg-grape/5 text-muted px-2.5 py-1 rounded-full"
                       >
                         {tag}
                       </span>
@@ -256,7 +256,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
                     {agent.platform_integrations.map((int) => (
                       <span
                         key={int}
-                        className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full"
+                        className="text-xs bg-grape/5 text-muted px-2.5 py-1 rounded-full"
                       >
                         {int}
                       </span>
@@ -270,16 +270,16 @@ export default async function AgentDetailPage({ params }: PageProps) {
       </div>
 
       {/* Performance */}
-      <div className="mt-8 bg-white rounded-2xl border border-slate-200 p-8">
-        <h2 className="text-lg font-bold text-slate-900 mb-6">
+      <div className="mt-8 bg-white rounded-2xl border border-grape/10 shadow-[0_8px_20px_rgba(255,107,74,0.06)] p-8">
+        <h2 className="font-display text-lg font-bold text-ink mb-6">
           Performance
         </h2>
         {evals.length === 0 ? (
-          <p className="text-sm text-slate-400 text-center py-4">
+          <p className="text-sm text-muted/70 text-center py-4">
             No published evals yet. Agents reach the Vetted tier by publishing benchmark scores.
           </p>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-grape/10">
             {evals.map((e) => (
               <EvalRow key={e.id} eval_={e} />
             ))}
@@ -296,7 +296,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
       <div className="mt-8 text-center">
         <Link
           href="/agents"
-          className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+          className="text-sm font-semibold text-grape hover:text-punch"
         >
           ← Browse more agents like this one
         </Link>
@@ -316,11 +316,11 @@ function Fact({
 }) {
   return (
     <div>
-      <dt className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">
+      <dt className="flex items-center gap-1.5 text-xs font-semibold text-muted uppercase tracking-wide mb-1">
         {icon}
         {label}
       </dt>
-      <dd className="text-sm text-slate-700 pl-5">{children}</dd>
+      <dd className="text-sm text-ink/80 pl-5">{children}</dd>
     </div>
   )
 }

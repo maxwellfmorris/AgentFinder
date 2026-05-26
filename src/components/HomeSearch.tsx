@@ -15,10 +15,10 @@ export function HomeSearch() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-slate-900 mb-3">
+      <h2 className="font-display text-2xl font-bold text-ink mb-3">
         Tell us what you&apos;re trying to do
       </h2>
-      <p className="text-sm text-slate-500 mb-4">
+      <p className="text-sm text-muted mb-4">
         We&apos;ll match you to agents that fit. Or browse by category below.
       </p>
       <form onSubmit={handleSubmit} className="flex gap-2">
@@ -27,11 +27,11 @@ export function HomeSearch() {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="e.g. plan a healthy week of meals, help me write a difficult email, summarize a long article"
-          className="flex-1 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-base outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          className="flex-1 rounded-2xl border border-grape/15 bg-white px-5 py-4 text-base outline-none focus:ring-2 focus:ring-grape focus:border-transparent"
         />
         <button
           type="submit"
-          className="bg-indigo-600 text-white font-semibold px-6 rounded-2xl hover:bg-indigo-700 transition-colors"
+          className="bg-grape text-white font-semibold px-6 rounded-2xl hover:brightness-110 transition"
         >
           Search
         </button>

@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 export default function FeedbackPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-bold text-slate-900 mb-2">Send feedback</h1>
-      <p className="text-slate-500 mb-8">
+      <h1 className="font-display text-3xl font-bold text-ink mb-2">Send feedback</h1>
+      <p className="text-muted mb-8">
         AgentFinder is in early beta. Your input genuinely shapes what we build next —
         tell us what&apos;s useful, what&apos;s confusing, or what&apos;s missing.
       </p>

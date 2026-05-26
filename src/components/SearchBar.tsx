@@ -27,13 +27,13 @@ export function SearchBar() {
     <div className="relative">
       <Search
         size={17}
-        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted/60 pointer-events-none"
       />
       <input
         type="search"
         value={value}
         placeholder="Search by name, task, or tool…"
-        className="w-full pl-10 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+        className="w-full pl-10 pr-10 py-3 bg-white border border-grape/15 rounded-2xl text-sm text-ink placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-grape focus:border-transparent"
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === 'Enter') submit(value)
@@ -45,7 +45,7 @@ export function SearchBar() {
             setValue('')
             submit('')
           }}
-          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted/60 hover:text-grape"
         >
           <X size={15} />
         </button>

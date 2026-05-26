@@ -50,7 +50,7 @@ export function SignInModal({ onClose }: SignInModalProps) {
       <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-8">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
+          className="absolute top-4 right-4 text-muted/60 hover:text-grape"
         >
           <X size={18} />
         </button>
@@ -60,10 +60,10 @@ export function SignInModal({ onClose }: SignInModalProps) {
             <div className="inline-flex items-center justify-center w-14 h-14 bg-emerald-100 rounded-full mb-4">
               <CheckCircle size={28} className="text-emerald-600" />
             </div>
-            <h2 className="text-xl font-bold text-slate-900 mb-2">Check your email</h2>
-            <p className="text-slate-500 text-sm mb-4">
+            <h2 className="font-display text-xl font-bold text-ink mb-2">Check your email</h2>
+            <p className="text-muted text-sm mb-4">
               We sent a sign-in link to{' '}
-              <span className="font-semibold text-slate-700">{email}</span>.
+              <span className="font-semibold text-ink/80">{email}</span>.
             </p>
             <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-left">
               <Monitor size={15} className="text-amber-600 flex-shrink-0 mt-0.5" />
@@ -76,11 +76,11 @@ export function SignInModal({ onClose }: SignInModalProps) {
         ) : (
           <>
             <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-xl mb-3">
-                <Mail size={22} className="text-indigo-600" />
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-grape/10 rounded-xl mb-3">
+                <Mail size={22} className="text-grape" />
               </div>
-              <h2 className="text-xl font-bold text-slate-900">Sign in to leave a review</h2>
-              <p className="text-slate-500 text-sm mt-1">
+              <h2 className="font-display text-xl font-bold text-ink">Sign in to leave a review</h2>
+              <p className="text-muted text-sm mt-1">
                 We&apos;ll send a magic link to your email — no password needed.
               </p>
             </div>
@@ -91,8 +91,8 @@ export function SignInModal({ onClose }: SignInModalProps) {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@yourcompany.com"
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="you@example.com"
+                className="w-full px-4 py-3 bg-cream border border-grape/15 rounded-xl text-sm text-ink placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-grape focus:border-transparent"
               />
 
               {error && <p className="text-sm text-red-600">{error}</p>}
@@ -100,7 +100,7 @@ export function SignInModal({ onClose }: SignInModalProps) {
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white font-semibold py-3 rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-60"
+                className="w-full flex items-center justify-center gap-2 bg-grape text-white font-semibold py-3 rounded-full hover:brightness-110 transition disabled:opacity-60"
               >
                 {status === 'loading' ? (
                   <>

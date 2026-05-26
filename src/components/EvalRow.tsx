@@ -18,17 +18,17 @@ export function EvalRow({ eval_ }: EvalRowProps) {
       </span>
 
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-slate-900 text-sm leading-snug">{eval_.benchmark_name}</p>
-        <p className="text-slate-600 text-sm">{scoreDisplay}</p>
+        <p className="font-semibold text-ink text-sm leading-snug">{eval_.benchmark_name}</p>
+        <p className="text-muted text-sm">{scoreDisplay}</p>
       </div>
 
       <div className="flex items-center gap-1.5 flex-shrink-0">
         {eval_.sample_size !== null && (
-          <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
+          <span className="text-xs bg-grape/5 text-muted px-2 py-0.5 rounded-full">
             n={eval_.sample_size}
           </span>
         )}
-        <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
+        <span className="text-xs bg-grape/5 text-muted px-2 py-0.5 rounded-full">
           {VERIFIED_BY_LABELS[eval_.verified_by]}
         </span>
       </div>

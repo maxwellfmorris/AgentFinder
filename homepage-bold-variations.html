@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentFinder — Bold Pop Variations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #111; }
+  img { max-width: 100%; }
+
+  /* ---- Switcher ---- */
+  .switcher {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    padding: 12px 20px; background: #15151c; border-bottom: 1px solid #2a2a35;
+  }
+  .switcher .label { color: #8a8a99; font-size: 13px; margin-right: 8px; font-weight: 500; }
+  .switcher button {
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+    color: #b8b8c8; background: transparent; border: 1px solid #33333f;
+    padding: 8px 16px; border-radius: 999px; cursor: pointer; transition: all .15s;
+  }
+  .switcher button:hover { color: #fff; border-color: #55556a; }
+  .switcher button.active { color: #111; background: #fff; border-color: #fff; }
+  .switcher .note { color: #6a6a7a; font-size: 12px; margin-left: auto; }
+
+  .mock { display: none; }
+  .mock.visible { display: block; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+  .cats { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .block { padding: 64px 0; }
+  @media (max-width: 860px) { .cats { grid-template-columns: repeat(2,1fr); } .cards { grid-template-columns: 1fr; } }
+
+  /* ====================================================================
+     B1 — LIME BRUTALIST  (the refined, fully-committed version of B)
+     indigo + lime, thick black borders, hard offset shadows, sticker badges
+     ==================================================================== */
+  .v1 { background: #FFFDF7; color: #16162B; }
+  .v1 .hero { background: #4F3DF5; color: #fff; border-bottom: 3px solid #16162B; position: relative; overflow: hidden; }
+  .v1 .deco { position: absolute; border: 3px solid #16162B; }
+  .v1 .deco1 { width: 220px; height: 220px; background: #C7F23D; border-radius: 50%; right: -50px; top: -70px; }
+  .v1 .deco2 { width: 120px; height: 120px; background: #FF5C8A; border-radius: 18px; right: 150px; bottom: -50px; transform: rotate(12deg); }
+  .v1 .nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; position: relative; z-index: 2; }
+  .v1 .brand { font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 700; }
+  .v1 .nav a { color: #fff; text-decoration: none; font-size: 15px; margin-left: 24px; }
+  .v1 .nav .cta { background: #C7F23D; color: #16162B; padding: 9px 18px; border-radius: 10px; font-weight: 700; border: 2px solid #16162B; box-shadow: 3px 3px 0 #16162B; }
+  .v1 .hero-inner { position: relative; z-index: 2; padding: 60px 0 78px; text-align: center; }
+  .v1 .badge { display: inline-block; background: #C7F23D; color: #16162B; padding: 8px 18px; border-radius: 999px; font-size: 14px; font-weight: 700; margin-bottom: 28px; border: 2px solid #16162B; box-shadow: 3px 3px 0 #16162B; }
+  .v1 h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(46px, 7vw, 86px); font-weight: 700; line-height: 1.02; letter-spacing: -.03em; max-width: 16ch; margin: 0 auto 24px; }
+  .v1 h1 .hl { background: #C7F23D; color: #16162B; padding: 0 12px; border-radius: 10px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  .v1 .lede { font-size: 20px; line-height: 1.55; color: rgba(255,255,255,.9); max-width: 50ch; margin: 0 auto; }
+  .v1 .cta-row { display: flex; gap: 14px; justify-content: center; margin-top: 38px; }
+  .v1 .btn-primary { background: #C7F23D; color: #16162B; border: 2px solid #16162B; padding: 16px 32px; border-radius: 12px; font-size: 17px; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0 #16162B; font-family: inherit; }
+  .v1 .btn-ghost { background: #fff; color: #16162B; border: 2px solid #16162B; padding: 16px 30px; border-radius: 12px; font-size: 17px; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0 #16162B; font-family: inherit; }
+  .v1 .sec-title { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 26px; }
+  .v1 .cat { border: 2px solid #16162B; border-radius: 14px; padding: 20px 14px; text-align: center; box-shadow: 3px 3px 0 #16162B; }
+  .v1 .cat .emoji { font-size: 28px; }
+  .v1 .cat .name { font-size: 13px; font-weight: 700; margin-top: 10px; line-height: 1.3; }
+  .v1 .card { background: #fff; border: 2px solid #16162B; border-radius: 18px; box-shadow: 6px 6px 0 #16162B; overflow: hidden; }
+  .v1 .card .top { height: 8px; }
+  .v1 .card .body { padding: 22px; }
+  .v1 .card .av { width: 46px; height: 46px; border-radius: 12px; border: 2px solid #16162B; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: #fff; margin-bottom: 14px; }
+  .v1 .card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .v1 .card p { font-size: 15px; color: #4a4a63; line-height: 1.5; }
+  .v1 .card .foot { margin-top: 16px; display: flex; gap: 8px; }
+  .v1 .tag { background: #F0EEFF; color: #4F3DF5; padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; border: 1.5px solid #16162B; }
+
+  /* ====================================================================
+     B2 — SUNSET POP  (warmer, friendlier; gradient hero, pillowy cards)
+     coral→pink→violet gradient, buttercream accent, soft colored shadows
+     ==================================================================== */
+  .v2 { background: #FFF9F4; color: #2A1A2E; }
+  .v2 .hero { background: linear-gradient(135deg, #FF6B4A 0%, #FF3D77 52%, #8B2FE6 100%); color: #fff; border-radius: 0 0 44px 44px; position: relative; overflow: hidden; }
+  .v2 .circle { position: absolute; border-radius: 50%; }
+  .v2 .c1 { width: 300px; height: 300px; right: -60px; top: -90px; background: rgba(255,255,255,.13); }
+  .v2 .c2 { width: 170px; height: 170px; left: 6%; bottom: -70px; background: rgba(255,255,255,.10); }
+  .v2 .nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; position: relative; z-index: 2; }
+  .v2 .brand { font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 700; }
+  .v2 .nav a { color: #fff; text-decoration: none; font-size: 15px; margin-left: 24px; opacity: .92; }
+  .v2 .nav .cta { background: #FFD23D; color: #2A1A2E; padding: 9px 18px; border-radius: 999px; font-weight: 700; opacity: 1; }
+  .v2 .hero-inner { position: relative; z-index: 2; padding: 58px 0 74px; text-align: center; }
+  .v2 .badge { display: inline-block; background: rgba(255,255,255,.18); color: #fff; padding: 8px 18px; border-radius: 999px; font-size: 14px; font-weight: 600; margin-bottom: 26px; backdrop-filter: blur(4px); }
+  .v2 h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(46px, 7vw, 84px); font-weight: 700; line-height: 1.02; letter-spacing: -.03em; max-width: 16ch; margin: 0 auto 22px; }
+  .v2 h1 .hl { color: #FFD23D; }
+  .v2 .lede { font-size: 20px; line-height: 1.55; color: rgba(255,255,255,.92); max-width: 50ch; margin: 0 auto; }
+  .v2 .cta-row { display: flex; gap: 14px; justify-content: center; margin-top: 36px; }
+  .v2 .btn-primary { background: #FFD23D; color: #2A1A2E; border: none; padding: 17px 34px; border-radius: 999px; font-size: 17px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 24px rgba(255,61,119,.40); font-family: inherit; }
+  .v2 .btn-ghost { background: rgba(255,255,255,.16); color: #fff; border: 1px solid rgba(255,255,255,.4); padding: 17px 30px; border-radius: 999px; font-size: 17px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .v2 .sec-title { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 26px; }
+  .v2 .cat { background: #fff; border-radius: 20px; padding: 20px 14px; text-align: center; box-shadow: 0 8px 20px rgba(255,107,74,.10); }
+  .v2 .cat .emoji { font-size: 28px; }
+  .v2 .cat .name { font-size: 13px; font-weight: 600; margin-top: 10px; line-height: 1.3; color: #4a3550; }
+  .v2 .card { background: #fff; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 38px rgba(139,47,230,.12); }
+  .v2 .card .top { height: 6px; }
+  .v2 .card .body { padding: 24px; }
+  .v2 .card .av { width: 46px; height: 46px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: #fff; margin-bottom: 14px; }
+  .v2 .card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .v2 .card p { font-size: 15px; color: #6a5870; line-height: 1.5; }
+  .v2 .card .foot { margin-top: 16px; display: flex; gap: 8px; }
+  .v2 .tag { background: #FFF0E8; color: #E8543A; padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+
+  /* ====================================================================
+     B3 — CANDY BLOCKS  (Memphis multicolor; floating hero panel, playful)
+     lilac page, violet rounded hero panel, scattered shapes, rainbow cards
+     ==================================================================== */
+  .v3 { background: #F5F1FF; color: #1B1240; }
+  .v3 .nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; }
+  .v3 .brand { font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 700; color: #1B1240; }
+  .v3 .nav a { color: #5a4b7a; text-decoration: none; font-size: 15px; margin-left: 24px; }
+  .v3 .nav .cta { background: #1B1240; color: #fff; padding: 9px 18px; border-radius: 999px; font-weight: 700; }
+  .v3 .hero { background: #6D3BF5; color: #fff; border-radius: 32px; padding: 64px 32px 70px; text-align: center; position: relative; overflow: hidden; margin-top: 12px; }
+  .v3 .shape { position: absolute; }
+  .v3 .s1 { width: 90px; height: 90px; border-radius: 50%; background: #C7F23D; left: 8%; top: 18%; }
+  .v3 .s2 { width: 64px; height: 64px; border-radius: 50%; border: 10px solid #FF5C7A; right: 10%; top: 22%; }
+  .v3 .s3 { width: 70px; height: 70px; background: #38D6E0; border-radius: 14px; right: 18%; bottom: 12%; transform: rotate(18deg); }
+  .v3 .s4 { width: 56px; height: 56px; background: #FFD23D; left: 14%; bottom: 14%; border-radius: 50%; }
+  .v3 .hero-inner { position: relative; z-index: 2; }
+  .v3 .badge { display: inline-block; background: rgba(255,255,255,.16); color: #fff; padding: 8px 18px; border-radius: 999px; font-size: 14px; font-weight: 600; margin-bottom: 26px; }
+  .v3 h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(44px, 6.6vw, 80px); font-weight: 700; line-height: 1.03; letter-spacing: -.03em; max-width: 16ch; margin: 0 auto 22px; }
+  .v3 h1 .hl { color: #C7F23D; }
+  .v3 .lede { font-size: 20px; line-height: 1.55; color: rgba(255,255,255,.9); max-width: 50ch; margin: 0 auto; }
+  .v3 .cta-row { display: flex; gap: 14px; justify-content: center; margin-top: 36px; }
+  .v3 .btn-primary { background: #FF5C7A; color: #fff; border: none; padding: 17px 34px; border-radius: 999px; font-size: 17px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .v3 .btn-ghost { background: #C7F23D; color: #1B1240; border: none; padding: 17px 30px; border-radius: 999px; font-size: 17px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .v3 .sec-title { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 26px; }
+  .v3 .cat { border-radius: 22px; padding: 20px 14px; text-align: center; }
+  .v3 .cat .emoji { font-size: 28px; }
+  .v3 .cat .name { font-size: 13px; font-weight: 700; margin-top: 10px; line-height: 1.3; }
+  .v3 .card { background: #fff; border-radius: 26px; overflow: hidden; box-shadow: 0 10px 28px rgba(109,59,245,.12); }
+  .v3 .card .top { height: 10px; }
+  .v3 .card .body { padding: 24px; }
+  .v3 .card .av { width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 19px; color: #fff; margin-bottom: 14px; }
+  .v3 .card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .v3 .card p { font-size: 15px; color: #5a4b7a; line-height: 1.5; }
+  .v3 .card .foot { margin-top: 16px; display: flex; gap: 8px; }
+  .v3 .tag { padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="switcher">
+  <span class="label">Bold-pop variation:</span>
+  <button data-target="v1" class="active">B1 · Lime Brutalist</button>
+  <button data-target="v2">B2 · Sunset Pop</button>
+  <button data-target="v3">B3 · Candy Blocks</button>
+  <span class="note">All three share the bold-pop DNA you liked — different palette + texture per option.</span>
+</div>
+
+<!-- ============ B1 — LIME BRUTALIST ============ -->
+<div class="mock visible v1" id="v1">
+  <div class="hero">
+    <div class="deco deco1"></div>
+    <div class="deco deco2"></div>
+    <div class="wrap">
+      <div class="nav">
+        <span class="brand">AgentFinder</span>
+        <nav><a>Browse</a><a>Categories</a><a class="cta">Submit an agent</a></nav>
+      </div>
+      <div class="hero-inner">
+        <span class="badge">No sales calls · just honest reviews</span>
+        <h1>Find AI agents that <span class="hl">fit your life</span></h1>
+        <p class="lede">Writing, money, learning, planning — discover tools for everything that isn't your day job, with honest reviews from real people.</p>
+        <div class="cta-row">
+          <button class="btn-primary">Browse agents</button>
+          <button class="btn-ghost">Start for free</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap block">
+    <h2 class="sec-title">What can we help you with?</h2>
+    <div class="cats">
+      <div class="cat" style="background:#EAE7FF"><div class="emoji">✍️</div><div class="name">Writing</div></div>
+      <div class="cat" style="background:#FFE9C2"><div class="emoji">📚</div><div class="name">Learning</div></div>
+      <div class="cat" style="background:#D6F5E3"><div class="emoji">💰</div><div class="name">Money</div></div>
+      <div class="cat" style="background:#FFE0EC"><div class="emoji">🏠</div><div class="name">Home</div></div>
+      <div class="cat" style="background:#E0F3FF"><div class="emoji">💪</div><div class="name">Health</div></div>
+      <div class="cat" style="background:#F3ECDB"><div class="emoji">🎨</div><div class="name">Hobbies</div></div>
+      <div class="cat" style="background:#E4FBE9"><div class="emoji">✈️</div><div class="name">Travel</div></div>
+    </div>
+  </div>
+  <div class="wrap block" style="padding-top:0;">
+    <h2 class="sec-title">A few to get you started</h2>
+    <div class="cards">
+      <div class="card"><div class="top" style="background:#4F3DF5"></div><div class="body"><div class="av" style="background:#4F3DF5">G</div><h3>Grammarly</h3><p>Real-time writing help that catches mistakes and sharpens your tone.</p><div class="foot"><span class="tag">Writing</span><span class="tag">Freemium</span></div></div></div>
+      <div class="card"><div class="top" style="background:#0F7A4D"></div><div class="body"><div class="av" style="background:#0F7A4D">C</div><h3>Cleo</h3><p>A money chat that breaks down your spending and nudges you to save.</p><div class="foot"><span class="tag" style="background:#D6F5E3;color:#0F7A4D">Money</span><span class="tag" style="background:#D6F5E3;color:#0F7A4D">Freemium</span></div></div></div>
+      <div class="card"><div class="top" style="background:#1f9e57"></div><div class="body"><div class="av" style="background:#1f9e57">M</div><h3>Mindtrip</h3><p>Plan a full trip — itinerary, maps, and bookings — with an AI companion.</p><div class="foot"><span class="tag" style="background:#E4FBE9;color:#1f9e57">Travel</span><span class="tag" style="background:#E4FBE9;color:#1f9e57">Freemium</span></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ B2 — SUNSET POP ============ -->
+<div class="mock v2" id="v2">
+  <div class="hero">
+    <div class="circle c1"></div>
+    <div class="circle c2"></div>
+    <div class="wrap">
+      <div class="nav">
+        <span class="brand">AgentFinder</span>
+        <nav><a>Browse</a><a>Categories</a><a class="cta">Submit an agent</a></nav>
+      </div>
+      <div class="hero-inner">
+        <span class="badge">No sales calls · just honest reviews</span>
+        <h1>Find AI agents that <span class="hl">fit your life</span></h1>
+        <p class="lede">Writing, money, learning, planning — discover tools for everything that isn't your day job, with honest reviews from real people.</p>
+        <div class="cta-row">
+          <button class="btn-primary">Browse agents</button>
+          <button class="btn-ghost">Start for free</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap block">
+    <h2 class="sec-title">What can we help you with?</h2>
+    <div class="cats">
+      <div class="cat"><div class="emoji">✍️</div><div class="name">Writing</div></div>
+      <div class="cat"><div class="emoji">📚</div><div class="name">Learning</div></div>
+      <div class="cat"><div class="emoji">💰</div><div class="name">Money</div></div>
+      <div class="cat"><div class="emoji">🏠</div><div class="name">Home</div></div>
+      <div class="cat"><div class="emoji">💪</div><div class="name">Health</div></div>
+      <div class="cat"><div class="emoji">🎨</div><div class="name">Hobbies</div></div>
+      <div class="cat"><div class="emoji">✈️</div><div class="name">Travel</div></div>
+    </div>
+  </div>
+  <div class="wrap block" style="padding-top:0;">
+    <h2 class="sec-title">A few to get you started</h2>
+    <div class="cards">
+      <div class="card"><div class="top" style="background:#FF6B4A"></div><div class="body"><div class="av" style="background:#FF6B4A">G</div><h3>Grammarly</h3><p>Real-time writing help that catches mistakes and sharpens your tone.</p><div class="foot"><span class="tag">Writing</span><span class="tag">Freemium</span></div></div></div>
+      <div class="card"><div class="top" style="background:#FF3D77"></div><div class="body"><div class="av" style="background:#FF3D77">C</div><h3>Cleo</h3><p>A money chat that breaks down your spending and nudges you to save.</p><div class="foot"><span class="tag" style="background:#FFE3EE;color:#D11E60">Money</span><span class="tag" style="background:#FFE3EE;color:#D11E60">Freemium</span></div></div></div>
+      <div class="card"><div class="top" style="background:#8B2FE6"></div><div class="body"><div class="av" style="background:#8B2FE6">M</div><h3>Mindtrip</h3><p>Plan a full trip — itinerary, maps, and bookings — with an AI companion.</p><div class="foot"><span class="tag" style="background:#F0E4FF;color:#7B23D6">Travel</span><span class="tag" style="background:#F0E4FF;color:#7B23D6">Freemium</span></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ B3 — CANDY BLOCKS ============ -->
+<div class="mock v3" id="v3">
+  <div class="wrap">
+    <div class="nav">
+      <span class="brand">AgentFinder</span>
+      <nav><a>Browse</a><a>Categories</a><a class="cta">Submit an agent</a></nav>
+    </div>
+    <div class="hero">
+      <div class="shape s1"></div>
+      <div class="shape s2"></div>
+      <div class="shape s3"></div>
+      <div class="shape s4"></div>
+      <div class="hero-inner">
+        <span class="badge">No sales calls · just honest reviews</span>
+        <h1>Find AI agents that <span class="hl">fit your life</span></h1>
+        <p class="lede">Writing, money, learning, planning — discover tools for everything that isn't your day job, with honest reviews from real people.</p>
+        <div class="cta-row">
+          <button class="btn-primary">Browse agents</button>
+          <button class="btn-ghost">Start for free</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap block">
+    <h2 class="sec-title">What can we help you with?</h2>
+    <div class="cats">
+      <div class="cat" style="background:#E4DEFF;color:#5B2FD6"><div class="emoji">✍️</div><div class="name">Writing</div></div>
+      <div class="cat" style="background:#FFE7B8;color:#B5730B"><div class="emoji">📚</div><div class="name">Learning</div></div>
+      <div class="cat" style="background:#C9F5DA;color:#0F7A4D"><div class="emoji">💰</div><div class="name">Money</div></div>
+      <div class="cat" style="background:#FFD9E6;color:#C2336B"><div class="emoji">🏠</div><div class="name">Home</div></div>
+      <div class="cat" style="background:#CFEEFF;color:#1E72B8"><div class="emoji">💪</div><div class="name">Health</div></div>
+      <div class="cat" style="background:#FFE0D2;color:#D1502A"><div class="emoji">🎨</div><div class="name">Hobbies</div></div>
+      <div class="cat" style="background:#D2F7E9;color:#0E9C73"><div class="emoji">✈️</div><div class="name">Travel</div></div>
+    </div>
+  </div>
+  <div class="wrap block" style="padding-top:0;">
+    <h2 class="sec-title">A few to get you started</h2>
+    <div class="cards">
+      <div class="card"><div class="top" style="background:#6D3BF5"></div><div class="body"><div class="av" style="background:#6D3BF5">G</div><h3>Grammarly</h3><p>Real-time writing help that catches mistakes and sharpens your tone.</p><div class="foot"><span class="tag" style="background:#E4DEFF;color:#5B2FD6">Writing</span><span class="tag" style="background:#E4DEFF;color:#5B2FD6">Freemium</span></div></div></div>
+      <div class="card"><div class="top" style="background:#0F7A4D"></div><div class="body"><div class="av" style="background:#0F7A4D">C</div><h3>Cleo</h3><p>A money chat that breaks down your spending and nudges you to save.</p><div class="foot"><span class="tag" style="background:#C9F5DA;color:#0F7A4D">Money</span><span class="tag" style="background:#C9F5DA;color:#0F7A4D">Freemium</span></div></div></div>
+      <div class="card"><div class="top" style="background:#FF5C7A"></div><div class="body"><div class="av" style="background:#FF5C7A">M</div><h3>Mindtrip</h3><p>Plan a full trip — itinerary, maps, and bookings — with an AI companion.</p><div class="foot"><span class="tag" style="background:#FFD9E6;color:#C2336B">Travel</span><span class="tag" style="background:#FFD9E6;color:#C2336B">Freemium</span></div></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const btns = document.querySelectorAll('.switcher button');
+  const mocks = { v1: document.getElementById('v1'), v2: document.getElementById('v2'), v3: document.getElementById('v3') };
+  btns.forEach(btn => btn.addEventListener('click', () => {
+    btns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    Object.values(mocks).forEach(m => m.classList.remove('visible'));
+    mocks[btn.dataset.target].classList.add('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }));
+</script>
+</body>
+</html>

@@ -44,43 +44,46 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-          <div className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+      <section className="relative overflow-hidden bg-gradient-to-br from-coral via-punch to-grape text-white rounded-b-[44px]">
+        <div className="pointer-events-none absolute -top-24 -right-16 w-80 h-80 rounded-full bg-white/10" />
+        <div className="pointer-events-none absolute -bottom-20 left-[6%] w-44 h-44 rounded-full bg-white/10" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+          <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded-full mb-7">
             No sales calls. No enterprise pricing. Just honest reviews.
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight max-w-3xl mx-auto">
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.03] tracking-tight max-w-3xl mx-auto">
             Find AI agents that
-            <span className="text-indigo-600"> actually fit your life</span>
+            <span className="text-butter"> fit your life</span>
           </h1>
 
-          <p className="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-6 text-lg sm:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
             Discover and compare AI tools for the things you actually do — writing, planning,
             learning, managing the parts of life that aren&apos;t your job. Honest reviews from
-            real users, no enterprise jargon.
+            real people, no enterprise jargon.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/agents"
-              className="inline-flex items-center gap-2 bg-indigo-600 text-white font-semibold text-lg px-8 py-4 rounded-full hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
+              className="inline-flex items-center justify-center gap-2 bg-butter text-ink font-bold text-lg px-8 py-4 rounded-full hover:brightness-105 transition shadow-lg shadow-punch/30"
             >
               Browse AI Agents
               <ArrowRight size={20} />
             </Link>
             <Link
               href="/agents?pricing=free,freemium"
-              className="inline-flex items-center gap-2 bg-white text-slate-700 font-semibold text-lg px-8 py-4 rounded-full border border-slate-200 hover:border-indigo-300 hover:text-indigo-700 transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-white/15 text-white font-semibold text-lg px-8 py-4 rounded-full border border-white/40 hover:bg-white/25 transition-colors"
             >
               Start for Free
             </Link>
           </div>
 
-          <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-slate-500">
+          <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-white/85">
             {['No credit card required', 'Affiliate disclosure on every link', 'Plain-language explanations'].map((t) => (
               <span key={t} className="flex items-center gap-1.5">
-                <CheckCircle size={15} className="text-emerald-500" />
+                <CheckCircle size={15} className="text-butter" />
                 {t}
               </span>
             ))}
@@ -95,16 +98,16 @@ export default async function HomePage() {
 
       {/* Browse by category */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-2xl font-bold text-slate-900 mb-8">What can we help you with?</h2>
+        <h2 className="font-display text-2xl sm:text-3xl font-bold text-ink mb-8">What can we help you with?</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
           {CATEGORIES.map((cat) => (
             <Link
               key={cat.label}
               href={cat.href}
-              className="group flex flex-col items-center gap-2 bg-white rounded-2xl border border-slate-200 p-4 text-center hover:border-indigo-300 hover:shadow-md transition-all"
+              className="group flex flex-col items-center gap-2 bg-white rounded-2xl p-4 text-center shadow-[0_8px_20px_rgba(255,107,74,0.08)] hover:shadow-[0_12px_28px_rgba(139,47,230,0.14)] hover:-translate-y-0.5 transition-all"
             >
               <span className="text-3xl">{cat.emoji}</span>
-              <span className="text-xs font-semibold text-slate-700 group-hover:text-indigo-700 leading-snug">
+              <span className="text-xs font-semibold text-ink/80 group-hover:text-grape leading-snug">
                 {cat.label}
               </span>
             </Link>
@@ -114,13 +117,13 @@ export default async function HomePage() {
 
       {/* Life-stage chip row */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 pb-12">
-        <p className="text-sm font-semibold text-slate-500 mb-4">Or browse by who you are</p>
+        <p className="text-sm font-semibold text-muted mb-4">Or browse by who you are</p>
         <div className="flex flex-wrap gap-2">
           {LIFE_STAGE_CHIPS.map((chip) => (
             <Link
               key={chip.label}
               href={`/agents?industry=${encodeURIComponent(chip.label)}`}
-              className="inline-flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 text-sm font-medium px-4 py-2 rounded-full hover:border-indigo-300 hover:text-indigo-700 hover:bg-indigo-50 transition-colors"
+              className="inline-flex items-center gap-1.5 bg-white border border-grape/15 text-ink/80 text-sm font-medium px-4 py-2 rounded-full hover:border-grape/40 hover:text-grape hover:bg-grape/5 transition-colors"
             >
               <span>{chip.emoji}</span>
               {chip.label}
@@ -132,10 +135,10 @@ export default async function HomePage() {
       {/* Featured agents */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold text-slate-900">
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-ink">
             A few to get you started
           </h2>
-          <Link href="/agents" className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+          <Link href="/agents" className="text-sm font-semibold text-grape hover:text-punch flex items-center gap-1">
             See all <ArrowRight size={14} />
           </Link>
         </div>
@@ -144,7 +147,7 @@ export default async function HomePage() {
             <div key={agent.id}>
               <AgentCard agent={agent} />
               {sponsored && isFeatured(agent) && (
-                <p className="text-[11px] text-slate-400 mt-1 pl-1">sponsored</p>
+                <p className="text-[11px] text-muted/70 mt-1 pl-1">sponsored</p>
               )}
             </div>
           ))}
@@ -152,32 +155,32 @@ export default async function HomePage() {
       </section>
 
       {/* Trust strip */}
-      <section className="bg-slate-900 text-white">
+      <section className="bg-ink text-white rounded-t-[44px]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid sm:grid-cols-3 gap-10 text-center">
           <div className="flex flex-col items-center gap-3">
-            <div className="bg-indigo-500/20 p-3 rounded-xl">
-              <Shield size={28} className="text-indigo-400" />
+            <div className="bg-white/10 p-3 rounded-xl">
+              <Shield size={28} className="text-butter" />
             </div>
-            <h3 className="font-bold text-lg">Tiered verification</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
+            <h3 className="font-display font-bold text-lg">Tiered verification</h3>
+            <p className="text-white/60 text-sm leading-relaxed">
               Every listing climbs a four-tier ladder — from self-submitted to independently audited — so you always know how much scrutiny an agent has passed before you give it your data.
             </p>
           </div>
           <div className="flex flex-col items-center gap-3">
-            <div className="bg-indigo-500/20 p-3 rounded-xl">
-              <Star size={28} className="text-indigo-400" />
+            <div className="bg-white/10 p-3 rounded-xl">
+              <Star size={28} className="text-butter" />
             </div>
-            <h3 className="font-bold text-lg">Honest reviews, no kickbacks</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
+            <h3 className="font-display font-bold text-lg">Honest reviews, no kickbacks</h3>
+            <p className="text-white/60 text-sm leading-relaxed">
               Reviews come from verified users — never paid, never editorialized. We earn a commission when you subscribe to an agent, but that never affects our rankings or trust tiers. Featured placements are clearly labeled &ldquo;sponsored.&rdquo;
             </p>
           </div>
           <div className="flex flex-col items-center gap-3">
-            <div className="bg-indigo-500/20 p-3 rounded-xl">
-              <Zap size={28} className="text-indigo-400" />
+            <div className="bg-white/10 p-3 rounded-xl">
+              <Zap size={28} className="text-butter" />
             </div>
-            <h3 className="font-bold text-lg">Made for everyday life</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
+            <h3 className="font-display font-bold text-lg">Made for everyday life</h3>
+            <p className="text-white/60 text-sm leading-relaxed">
               From drafting a hard message to planning a healthy week, we explain what each agent actually does in plain language — without the enterprise jargon.
             </p>
           </div>

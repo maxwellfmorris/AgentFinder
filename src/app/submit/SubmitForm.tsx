@@ -96,14 +96,14 @@ export function SubmitForm() {
         <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4">
           <CheckCircle size={32} className="text-emerald-600" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900 mb-2">Submission received!</h2>
-        <p className="text-slate-500 mb-6">
+        <h2 className="font-display text-xl font-bold text-ink mb-2">Submission received!</h2>
+        <p className="text-muted mb-6">
           Your agent is in the review queue. Once it&apos;s approved, it&apos;ll appear in the
           catalog — you can track its status anytime on your dashboard.
         </p>
         <button
           onClick={() => setStatus('idle')}
-          className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+          className="text-sm font-semibold text-grape hover:text-punch"
         >
           Submit another agent
         </button>
@@ -114,11 +114,11 @@ export function SubmitForm() {
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
       {/* Smart import */}
-      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-          Smart import <span className="normal-case font-normal text-slate-400">(optional)</span>
+      <div className="bg-cream border border-grape/10 rounded-2xl p-5">
+        <h3 className="text-xs font-bold text-muted uppercase tracking-wider mb-1">
+          Smart import <span className="normal-case font-normal text-muted/70">(optional)</span>
         </h3>
-        <p className="text-sm text-slate-500 mb-3">
+        <p className="text-sm text-muted mb-3">
           Paste your homepage URL and we&apos;ll fill in what we can.
         </p>
         <div className="flex gap-2">
@@ -133,7 +133,7 @@ export function SubmitForm() {
             type="button"
             disabled={importStatus === 'loading' || !importUrl.trim()}
             onClick={handleImport}
-            className="flex items-center gap-1.5 bg-slate-900 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-slate-700 transition-colors disabled:opacity-50 flex-shrink-0"
+            className="flex items-center gap-1.5 bg-ink text-white text-sm font-semibold px-4 py-2 rounded-full hover:brightness-125 transition disabled:opacity-50 flex-shrink-0"
           >
             {importStatus === 'loading' ? (
               <><Loader2 size={14} className="animate-spin" /> Importing...</>
@@ -143,12 +143,12 @@ export function SubmitForm() {
           </button>
         </div>
         {importStatus === 'error' && (
-          <p className="text-sm text-slate-500 mt-2">{importError}</p>
+          <p className="text-sm text-muted mt-2">{importError}</p>
         )}
         {importWarnings.length > 0 && (
           <ul className="mt-2 space-y-0.5">
             {importWarnings.map((w) => (
-              <li key={w} className="text-xs text-slate-400 before:content-['·'] before:mr-1">{w}</li>
+              <li key={w} className="text-xs text-muted/70 before:content-['·'] before:mr-1">{w}</li>
             ))}
           </ul>
         )}
@@ -181,7 +181,7 @@ export function SubmitForm() {
           />
         </Field>
 
-        <Field label="Description" required hint="2–4 sentences for business professionals, no jargon" chip={autoFilled.has('description') ? <AutoFilledChip /> : undefined}>
+        <Field label="Description" required hint="2–4 sentences in plain language, no jargon" chip={autoFilled.has('description') ? <AutoFilledChip /> : undefined}>
           <textarea
             name="description"
             required
@@ -195,7 +195,7 @@ export function SubmitForm() {
 
         <Field label="Website URL" required chip={autoFilled.has('website') ? <AutoFilledChip /> : undefined}>
           <div className="flex">
-            <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-slate-200 bg-slate-100 text-slate-500 text-sm">
+            <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-grape/15 bg-grape/5 text-muted text-sm">
               https://
             </span>
             <input
@@ -208,14 +208,14 @@ export function SubmitForm() {
                 setWebsiteVal(e.target.value.replace(/^https?:\/\//i, ''))
                 clearAutoFill('website')
               }}
-              className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-r-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="flex-1 px-4 py-2.5 bg-cream border border-grape/15 rounded-r-xl text-sm text-ink placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-grape focus:border-transparent"
             />
           </div>
         </Field>
 
         <Field label="Logo URL" hint="Direct link to a square image (optional)" chip={autoFilled.has('logo_url') ? <AutoFilledChip /> : undefined}>
           <div className="flex">
-            <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-slate-200 bg-slate-100 text-slate-500 text-sm">
+            <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-grape/15 bg-grape/5 text-muted text-sm">
               https://
             </span>
             <input
@@ -227,7 +227,7 @@ export function SubmitForm() {
                 setLogoVal(e.target.value.replace(/^https?:\/\//i, ''))
                 clearAutoFill('logo_url')
               }}
-              className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-r-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="flex-1 px-4 py-2.5 bg-cream border border-grape/15 rounded-r-xl text-sm text-ink placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-grape focus:border-transparent"
             />
           </div>
         </Field>
@@ -264,7 +264,7 @@ export function SubmitForm() {
       </Section>
 
       {/* Tags */}
-      <Section title="Integrations &amp; Industries">
+      <Section title="Integrations &amp; Audience">
         <Field
           label="Platform integrations"
           hint="Comma-separated list of tools this agent connects with"
@@ -272,19 +272,19 @@ export function SubmitForm() {
           <input
             name="platform_integrations"
             type="text"
-            placeholder="Gmail, Slack, Salesforce, Notion..."
+            placeholder="Gmail, Google Calendar, Notion, WhatsApp..."
             className={inputClass}
           />
         </Field>
 
         <Field
-          label="Industry tags"
-          hint="Comma-separated list of industries this is best suited for"
+          label="Who it's for"
+          hint="Comma-separated list of people or life stages this is best for"
         >
           <input
             name="industry_tags"
             type="text"
-            placeholder="SaaS, Finance, HR, Marketing..."
+            placeholder="Parents, Students, Renters, Travelers..."
             className={inputClass}
           />
         </Field>
@@ -299,7 +299,7 @@ export function SubmitForm() {
       <button
         type="submit"
         disabled={status === 'loading'}
-        className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white font-semibold py-3 rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-60"
+        className="w-full flex items-center justify-center gap-2 bg-grape text-white font-semibold py-3 rounded-full hover:brightness-110 transition disabled:opacity-60"
       >
         {status === 'loading' ? (
           <>
@@ -315,11 +315,11 @@ export function SubmitForm() {
 }
 
 const inputClass =
-  'w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent'
+  'w-full px-4 py-2.5 bg-cream border border-grape/15 rounded-xl text-sm text-ink placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-grape focus:border-transparent'
 
 function AutoFilledChip() {
   return (
-    <span className="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full ml-2">
+    <span className="text-xs text-grape bg-grape/10 px-2 py-0.5 rounded-full ml-2">
       from your site
     </span>
   )
@@ -328,7 +328,7 @@ function AutoFilledChip() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">{title}</h3>
+      <h3 className="text-xs font-bold text-muted uppercase tracking-wider mb-4">{title}</h3>
       <div className="space-y-4">{children}</div>
     </div>
   )
@@ -349,12 +349,12 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+      <label className="block text-sm font-semibold text-ink/80 mb-1.5">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
         {chip}
       </label>
-      {hint && <p className="text-xs text-slate-400 mb-1.5">{hint}</p>}
+      {hint && <p className="text-xs text-muted/70 mb-1.5">{hint}</p>}
       {children}
     </div>
   )

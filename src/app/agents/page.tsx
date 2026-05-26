@@ -9,13 +9,13 @@ import type { PricingModel } from '@/types/database'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Browse AI Agents for Business',
+  title: 'Browse AI Agents',
   description:
-    'Find the right AI agent for your team. Filter by category, pricing, and integrations. Verified listings with real user reviews.',
+    'Find an AI agent that fits your life. Filter by what you want to do, what it costs, and the tools it works with — honest listings with real reviews.',
   openGraph: {
-    title: 'Browse AI Agents for Business — AgentFinder',
+    title: 'Browse AI Agents — AgentFinder',
     description:
-      'Find the right AI agent for your team. Filter by category, pricing, and integrations.',
+      'Find an AI agent that fits your life. Filter by what you want to do, what it costs, and the tools it works with.',
   },
 }
 
@@ -58,9 +58,9 @@ export default async function AgentsPage({ searchParams }: PageProps) {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Page header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Browse AI Agents</h1>
-        <p className="text-slate-500">
-          Discover agents that work the way your team already works — no technical setup required.
+        <h1 className="font-display text-3xl sm:text-4xl font-bold text-ink mb-2">Browse AI Agents</h1>
+        <p className="text-muted">
+          Filter by what you want to do, what it costs, and the tools it already works with — in plain language.
         </p>
       </div>
 
@@ -74,7 +74,7 @@ export default async function AgentsPage({ searchParams }: PageProps) {
       <div className="flex gap-8">
         {/* Sidebar */}
         <div className="hidden lg:block w-56 flex-shrink-0">
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 sticky top-24">
+          <div className="bg-white rounded-2xl border border-grape/10 shadow-[0_8px_20px_rgba(255,107,74,0.06)] p-5 sticky top-24">
             <Suspense>
               <FilterSidebar />
             </Suspense>
@@ -86,7 +86,7 @@ export default async function AgentsPage({ searchParams }: PageProps) {
           {/* Sponsored row — only when category filter active and results exist */}
           {categoryFeatured.length > 0 && (
             <div className="mb-8">
-              <p className="text-[11px] text-slate-400 mb-2">sponsored</p>
+              <p className="text-[11px] text-muted/70 mb-2">sponsored</p>
               <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
                 {categoryFeatured.map((agent) => (
                   <AgentCard key={agent.id} agent={agent} />
@@ -97,15 +97,15 @@ export default async function AgentsPage({ searchParams }: PageProps) {
 
           {/* Results count */}
           <div className="flex items-center justify-between mb-5">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted">
               {agents.length === 0 ? (
                 'No agents found'
               ) : (
                 <>
-                  <span className="font-semibold text-slate-900">{agents.length}</span>{' '}
+                  <span className="font-semibold text-ink">{agents.length}</span>{' '}
                   {agents.length === 1 ? 'agent' : 'agents'} found
                   {activeFilterCount > 0 && (
-                    <span className="ml-1 text-slate-400">
+                    <span className="ml-1 text-muted/70">
                       with {activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} applied
                     </span>
                   )}
@@ -113,8 +113,8 @@ export default async function AgentsPage({ searchParams }: PageProps) {
               )}
             </p>
             {search && (
-              <p className="text-sm text-slate-500">
-                Results for <span className="font-semibold text-slate-700">&ldquo;{search}&rdquo;</span>
+              <p className="text-sm text-muted">
+                Results for <span className="font-semibold text-ink">&ldquo;{search}&rdquo;</span>
               </p>
             )}
           </div>
@@ -141,10 +141,10 @@ export default async function AgentsPage({ searchParams }: PageProps) {
 
 function EmptyState() {
   return (
-    <div className="text-center py-20 bg-white rounded-2xl border border-slate-200">
+    <div className="text-center py-20 bg-white rounded-2xl border border-grape/10 shadow-[0_8px_20px_rgba(255,107,74,0.06)]">
       <div className="text-5xl mb-4">🔍</div>
-      <h3 className="text-lg font-bold text-slate-900 mb-2">No agents match your filters</h3>
-      <p className="text-slate-500 text-sm max-w-sm mx-auto">
+      <h3 className="font-display text-lg font-bold text-ink mb-2">No agents match your filters</h3>
+      <p className="text-muted text-sm max-w-sm mx-auto">
         Try removing a filter or broadening your search. New agents are added every week.
       </p>
     </div>

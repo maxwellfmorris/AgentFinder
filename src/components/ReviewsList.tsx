@@ -26,7 +26,7 @@ function VerifiedChip({ claim, months }: { claim: UsageClaim; months: number | n
   const label = claim === 'paying' ? 'paying' : 'on free trial'
   const text = months !== null ? `Verified user · ${label} · ${months} months` : `Verified user · ${label}`
   return (
-    <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700">
+    <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full bg-grape/10 text-grape">
       {text}
     </span>
   )
@@ -50,12 +50,12 @@ export function ReviewsList({ agentId, refreshKey }: ReviewsListProps) {
   }, [agentId, refreshKey])
 
   if (loading) {
-    return <div className="text-sm text-slate-400 py-4">Loading reviews...</div>
+    return <div className="text-sm text-muted/70 py-4">Loading reviews...</div>
   }
 
   if (reviews.length === 0) {
     return (
-      <div className="text-center py-8 text-slate-400 text-sm">
+      <div className="text-center py-8 text-muted/70 text-sm">
         No reviews yet — be the first to share your experience.
       </div>
     )
@@ -64,14 +64,14 @@ export function ReviewsList({ agentId, refreshKey }: ReviewsListProps) {
   return (
     <div className="space-y-4">
       {reviews.map((review) => (
-        <div key={review.id} className="bg-slate-50 rounded-2xl p-5">
+        <div key={review.id} className="bg-cream rounded-2xl p-5">
           <div className="flex items-start justify-between gap-4 mb-3">
             <div>
-              <p className="text-sm font-semibold text-slate-700">
+              <p className="text-sm font-semibold text-ink/80">
                 {review.user_email.split('@')[0]}
               </p>
               <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-muted/70">
                   {new Date(review.created_at).toLocaleDateString('en-US', {
                     month: 'long',
                     day: 'numeric',
@@ -95,7 +95,7 @@ export function ReviewsList({ agentId, refreshKey }: ReviewsListProps) {
               ))}
             </div>
           </div>
-          <p className="text-sm text-slate-600 leading-relaxed">{review.body}</p>
+          <p className="text-sm text-muted leading-relaxed">{review.body}</p>
         </div>
       ))}
     </div>
