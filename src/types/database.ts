@@ -25,6 +25,7 @@ export interface Agent {
   featured_until: string | null
   featured_tier: FeaturedTier
   status: AgentStatus
+  use_cases: string[]
 }
 
 export function isFeatured(agent: { featured_until: string | null }): boolean {

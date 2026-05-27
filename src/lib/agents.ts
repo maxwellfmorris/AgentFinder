@@ -25,6 +25,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     featured_until: null,
     featured_tier: 'none' as FeaturedTier,
     status: 'published',
+    use_cases: [],
   },
   {
     id: '2',
@@ -48,6 +49,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     featured_until: null,
     featured_tier: 'none' as FeaturedTier,
     status: 'published',
+    use_cases: [],
   },
   {
     id: '3',
@@ -71,6 +73,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     featured_until: null,
     featured_tier: 'none' as FeaturedTier,
     status: 'published',
+    use_cases: [],
   },
   {
     id: '4',
@@ -94,6 +97,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     featured_until: null,
     featured_tier: 'none' as FeaturedTier,
     status: 'published',
+    use_cases: [],
   },
   {
     id: '5',
@@ -117,6 +121,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     featured_until: null,
     featured_tier: 'none' as FeaturedTier,
     status: 'published',
+    use_cases: [],
   },
 ]
 

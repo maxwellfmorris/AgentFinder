@@ -10,13 +10,13 @@ import {
   Puzzle,
   Building2,
   Shield,
+  Check,
 } from 'lucide-react'
-import { getAgentBySlug, getLatestEvalsForAgent, getReviewStatsForAgent, getTasksForAgent } from '@/lib/agents'
+import { getAgentBySlug, getLatestEvalsForAgent, getReviewStatsForAgent } from '@/lib/agents'
 import { PRICING_LABELS, COMPLEXITY_LABELS, COMPLEXITY_DESCRIPTIONS, TIER_DESCRIPTIONS } from '@/types/database'
 import { TierChip } from '@/components/TierChip'
 import { EvalRow } from '@/components/EvalRow'
 import { ReviewsSection } from '@/components/ReviewsSection'
-import { QuickTaskCard } from '@/components/QuickTaskCard'
 
 interface PageProps {
   params: { slug: string }
@@ -52,10 +52,9 @@ export default async function AgentDetailPage({ params }: PageProps) {
   const agent = await getAgentBySlug(params.slug)
   if (!agent) notFound()
 
-  const [evals, reviewStats, tasks] = await Promise.all([
+  const [evals, reviewStats] = await Promise.all([
     getLatestEvalsForAgent(agent.id),
     getReviewStatsForAgent(agent.id),
-    getTasksForAgent(agent.id),
   ])
 
   const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://agentfinder.com'
@@ -89,6 +88,9 @@ export default async function AgentDetailPage({ params }: PageProps) {
     medium: 'bg-amber-100 text-amber-800',
     high: 'bg-red-100 text-red-800',
   }[agent.setup_complexity]
+
+  // Defensive: tolerate rows from before the use_cases column existed
+  const useCases = agent.use_cases ?? []
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -183,15 +185,21 @@ export default async function AgentDetailPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Quick Tasks — only rendered when at least one task exists */}
-        {tasks.length > 0 && (
+        {/* Good for — honest use-cases (repurposed from the old Quick Tasks; no payment) */}
+        {useCases.length > 0 && (
           <div className="p-8 border-b border-grape/10">
             <h2 className="text-sm font-bold text-muted uppercase tracking-wider mb-4">
-              Quick Tasks
+              Good for
             </h2>
             <div className="grid sm:grid-cols-2 gap-3">
-              {tasks.map((task) => (
-                <QuickTaskCard key={task.id} task={task} agentWebsite={agent.website} />
+              {useCases.map((useCase) => (
+                <div
+                  key={useCase}
+                  className="flex items-start gap-2.5 bg-grape/5 rounded-2xl px-4 py-3"
+                >
+                  <Check size={16} className="text-grape flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-ink/80 leading-snug">{useCase}</span>
+                </div>
               ))}
             </div>
           </div>
