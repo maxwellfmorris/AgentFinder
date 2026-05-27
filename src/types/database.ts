@@ -168,7 +168,12 @@ export type Database = {
       }
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      search_agents: {
+        Args: { q: string }
+        Returns: (Agent & Record<string, unknown>)[]
+      }
+    }
     Enums: {
       pricing_model: PricingModel
       setup_complexity: SetupComplexity

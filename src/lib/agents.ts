@@ -133,6 +133,25 @@ export interface AgentFilters {
   search?: string
 }
 
+// Category / pricing / life-stage / integration filters applied in JS.
+// Used by the search path, where relevance ranking happens in the DB function.
+function applyClientFilters(agents: Agent[], filters: AgentFilters): Agent[] {
+  let results = agents
+  if (filters.categories?.length) {
+    results = results.filter((a) => filters.categories!.includes(a.category))
+  }
+  if (filters.pricingModels?.length) {
+    results = results.filter((a) => filters.pricingModels!.includes(a.pricing_model))
+  }
+  if (filters.industries?.length) {
+    results = results.filter((a) => filters.industries!.some((i) => a.industry_tags.includes(i)))
+  }
+  if (filters.integrations?.length) {
+    results = results.filter((a) => filters.integrations!.some((i) => a.platform_integrations.includes(i)))
+  }
+  return results
+}
+
 export async function getAgents(filters: AgentFilters = {}): Promise<Agent[]> {
   const supabase = getSupabaseClient()
 
@@ -140,7 +159,17 @@ export async function getAgents(filters: AgentFilters = {}): Promise<Agent[]> {
     return filterLocally(PLACEHOLDER_AGENTS, filters)
   }
 
+  const search = filters.search?.trim()
+
   try {
+    // Search path — relevance-ranked DB function (keywords + prefix + fuzzy fallback)
+    if (search) {
+      const { data, error } = await supabase.rpc('search_agents', { q: search })
+      if (error) throw error
+      return applyClientFilters((data ?? []) as Agent[], filters)
+    }
+
+    // Browse path — filterable, popularity-ordered
     let query = supabase
       .from('agents')
       .select('*')
@@ -155,12 +184,6 @@ export async function getAgents(filters: AgentFilters = {}): Promise<Agent[]> {
     }
     if (filters.industries?.length) {
       query = query.overlaps('industry_tags', filters.industries)
-    }
-    if (filters.search) {
-      query = query.textSearch('search_vector', filters.search, {
-        type: 'plain',
-        config: 'english',
-      })
     }
 
     const { data, error } = await query
