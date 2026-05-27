@@ -72,7 +72,7 @@ src/
 │   ├── AgentCard.tsx                  # The card shown in every grid; accepts optional onView prop for click logging
 │   ├── TierChip.tsx                   # Colored chip showing trust_tier (Listed/Verified/Vetted/Audited)
 │   ├── EvalRow.tsx                    # One eval benchmark row with letter-grade chip
-│   ├── QuickTaskCard.tsx              # Pre-priced task tile (outbound link with UTM)
+│   ├── QuickTaskCard.tsx              # ORPHANED — old pre-priced task tile; no longer imported (Quick Tasks repurposed into "Good for"). Safe to delete.
 │   ├── ReviewForm.tsx                 # Review submission with usage_claim radio + months_used input
 │   ├── ReviewsList.tsx                # Reviews display with "Verified user · paying · N months" chip
 │   ├── ReviewsSection.tsx             # Wraps form + list with refresh-on-submit
@@ -100,7 +100,7 @@ supabase/
 ├── seed.sql                           # OLD fictional 14-agent catalog — stale; live catalog is the 18 real agents (migrations 0014 + 0016). Don't re-run on prod.
 ├── seed_evals.sql                     # Sample evals for fictional agents — stale (those agents were deleted in 0015)
 ├── seed_tasks.sql                     # Sample Quick Tasks for fictional agents — stale (those agents were deleted in 0015)
-└── migrations/                        # 17 numbered migrations, applied in order
+└── migrations/                        # 19 numbered migrations, applied in order
     ├── 0000_reviews_table.sql         # The reviews table (originally created in dashboard, captured here)
     ├── 0001_review_rating_trigger.sql # Trigger that recomputes agents.average_rating/review_count on review change
     ├── 0002_trust_tier.sql            # Replaces `verified bool` with `trust_tier` enum
@@ -117,7 +117,9 @@ supabase/
     ├── 0013_agent_status.sql          # Moderation gate: status column (pending/published/rejected); backfills existing → published
     ├── 0014_real_agents_seed.sql      # Seeds 12 real consumer AI products (published, trust_tier listed, no ratings)
     ├── 0015_remove_fictional_agents.sql # Deletes the 14 fictional example.com seed agents
-    └── 0016_health_travel_agents.sql  # Adds 6 real agents to round out Health & Wellness (Ada Health, WHOOP, Headspace) + Travel (Hopper, GuideGeek, Wanderlog)
+    ├── 0016_health_travel_agents.sql  # Adds 6 real agents to round out Health & Wellness (Ada Health, WHOOP, Headspace) + Travel (Hopper, GuideGeek, Wanderlog)
+    ├── 0017_agent_use_cases.sql        # Adds use_cases text[] column (default '{}'); seeds Grammarly's "Good for" list as the test case
+    └── 0018_use_cases_seed.sql         # Seeds "Good for" use_cases for the remaining 17 agents (slug-scoped UPDATEs)
 ```
 
 ---
@@ -275,6 +277,9 @@ Phase 3 will add an `affiliate_url` column on agents and update outbound CTAs to
 - **Real catalog (Week 2)** — 12 real, current consumer AI products seeded (`published`, `listed` tier, no fabricated ratings); all 14 fictional placeholders removed; homepage now pulls real published agents. Later expanded to **18** via migration 0016 (6 added to the two thinnest categories).
 - **Pivot cleanup (Week 2)** — site metadata refreshed to consumer voice; dead "Meetings"/"Analytics" header nav links repointed to live categories (Money, Learning).
 - **Mobile filtering** — Browse (`/agents`) filter sidebar is `hidden lg:block`; on mobile a `MobileFilters` "Filters" button + slide-in drawer (reusing `FilterSidebar`) exposes the full filter set. Resolves the old gap where phone users could only keyword-search.
+- **Mobile-tappable cards** — `AgentCard` uses a stretched-link overlay (`after:absolute after:inset-0` on the View Details link, external link lifted with `relative z-10`) so the whole tile navigates to the detail page. Scoped to mobile only via `lg:after:content-none` (desktop = button/link only).
+- **Mobile detail hero fix** — the detail-page hero stacks on mobile (`flex-col lg:flex-row`): logo + name/tagline group at full width, "Visit Website" drops below as a full-width button, padding eased to `p-6 sm:p-8`. Fixes the cramped one-word-per-line tagline + button-over-title overlap.
+- **"Good for" use-cases** — repurposed the old payment-oriented Quick Tasks into honest, free use-cases. Added `use_cases text[]` column to `agents` (Agent type field; migration 0017) and seeded all 18 agents (0017 Grammarly, 0018 the rest) with 4 plain-language phrases each. Detail page renders a "Good for" section of grape-tinted chips, only when `use_cases` is non-empty (guarded with `?? []`). Rendered via a `GoodFor` helper in two responsive instances: desktop full-width above the About/At-a-Glance grid (`hidden sm:block`), mobile as a grid child between About and At a Glance (`sm:hidden`). `getTasksForAgent`/`QuickTaskCard`/`agent_tasks` are now unused by the app.
 
 ### Current catalog (18 real agents)
 
@@ -329,6 +334,7 @@ Converted surfaces (every page + shared component): homepage, AgentCard, Header/
 
 - `schema.sql`'s top drop-list is missing entries for `agent_tasks`, `agent_evals`, `search_events`. Fresh-clone bootstrap from `schema.sql` alone would fail to drop those tables before recreating. Cosmetic; the migrations are the operational source of truth.
 - `AuthProvider.tsx`, `ReviewsList.tsx`, `SignInModal.tsx` each have a single `react-hooks/exhaustive-deps` warning. Pre-existing, non-blocking. Worth a cleanup pass eventually.
+- Quick Tasks plumbing is now orphaned after the "Good for" repurpose: `QuickTaskCard.tsx`, `getTasksForAgent` in `lib/agents.ts`, the `agent_tasks` table (migration 0007), and `seed_tasks.sql` are no longer referenced by the app. Harmless, but a candidate for a full removal pass (drop the table + dead code) if we want to fully retire it.
 - `PLACEHOLDER_AGENTS` in `lib/agents.ts` still holds the 5 OLD fictional entries (Draftly / BudgetSense / MealMate / DayPulse / Journie). It's now used *only* as the dev-without-Supabase fallback — the homepage no longer displays it. Stale but harmless; worth swapping for a couple of real entries eventually.
 - The smart-import server action does a full `.text()` then `.slice(0, 200 * 1024)` — the body is downloaded entirely before truncation. The 5s timeout is the actual hostile-input protection. Worth switching to streaming if it becomes a hotspot.
 - Two emoji collisions on the homepage are kept *by design* as semantic anchors: 🏠 appears on both the "Home & Family" category tile and the "Renters" chip; ✈️ on both "Travel & Planning" and "Travelers". Documented and accepted.
