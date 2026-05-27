@@ -185,24 +185,9 @@ export default async function AgentDetailPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Good for — honest use-cases (repurposed from the old Quick Tasks; no payment) */}
+        {/* Good for — desktop: full-width above the details grid (mobile copy lives inside the grid below) */}
         {useCases.length > 0 && (
-          <div className="p-8 border-b border-grape/10">
-            <h2 className="text-sm font-bold text-muted uppercase tracking-wider mb-4">
-              Good for
-            </h2>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {useCases.map((useCase) => (
-                <div
-                  key={useCase}
-                  className="flex items-start gap-2.5 bg-grape/5 rounded-2xl px-4 py-3"
-                >
-                  <Check size={16} className="text-grape flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-ink/80 leading-snug">{useCase}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <GoodFor useCases={useCases} className="hidden sm:block p-8 border-b border-grape/10" />
         )}
 
         {/* Details grid */}
@@ -214,6 +199,11 @@ export default async function AgentDetailPage({ params }: PageProps) {
             </h2>
             <p className="text-ink/80 leading-relaxed">{agent.description}</p>
           </div>
+
+          {/* Good for — mobile only: sits between About and At a Glance */}
+          {useCases.length > 0 && (
+            <GoodFor useCases={useCases} className="sm:hidden p-8" />
+          )}
 
           {/* Quick facts */}
           <div className="p-8">
@@ -310,6 +300,25 @@ export default async function AgentDetailPage({ params }: PageProps) {
         >
           ← Browse more agents like this one
         </Link>
+      </div>
+    </div>
+  )
+}
+
+function GoodFor({ useCases, className }: { useCases: string[]; className: string }) {
+  return (
+    <div className={className}>
+      <h2 className="text-sm font-bold text-muted uppercase tracking-wider mb-4">Good for</h2>
+      <div className="grid sm:grid-cols-2 gap-3">
+        {useCases.map((useCase) => (
+          <div
+            key={useCase}
+            className="flex items-start gap-2.5 bg-grape/5 rounded-2xl px-4 py-3"
+          >
+            <Check size={16} className="text-grape flex-shrink-0 mt-0.5" />
+            <span className="text-sm text-ink/80 leading-snug">{useCase}</span>
+          </div>
+        ))}
       </div>
     </div>
   )
