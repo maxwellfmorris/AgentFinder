@@ -26,6 +26,10 @@ export interface Agent {
   featured_tier: FeaturedTier
   status: AgentStatus
   use_cases: string[]
+  external_rating: number | null
+  external_rating_count: number | null
+  external_rating_source: string | null
+  external_rating_url: string | null
 }
 
 export function isFeatured(agent: { featured_until: string | null }): boolean {
