@@ -18,6 +18,16 @@ import { TierChip } from '@/components/TierChip'
 import { EvalRow } from '@/components/EvalRow'
 import { ReviewsSection } from '@/components/ReviewsSection'
 
+// Compact count formatter: 181200 → "181k", 4100000 → "4.1M", 60 → "60"
+function formatRatingCount(n: number): string {
+  if (n >= 1_000_000) {
+    const m = (n / 1_000_000).toFixed(1)
+    return `${m.endsWith('.0') ? m.slice(0, -2) : m}M`
+  }
+  if (n >= 1_000) return `${Math.round(n / 1_000)}k`
+  return String(n)
+}
+
 interface PageProps {
   params: { slug: string }
 }
@@ -137,7 +147,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
 
               <p className="text-muted font-medium mb-3">{agent.tagline}</p>
 
-              {(reviewStats.verifiedCount > 0 || reviewStats.totalCount > 0) && (() => {
+              {(reviewStats.verifiedCount > 0 || reviewStats.totalCount > 0) ? (() => {
                 const primaryAvg = reviewStats.verifiedCount > 0
                   ? reviewStats.verifiedAvg!
                   : reviewStats.totalAvg!
@@ -167,7 +177,31 @@ export default async function AgentDetailPage({ params }: PageProps) {
                     </p>
                   </div>
                 )
-              })()}
+              })() : (agent.external_rating !== null && agent.external_rating_url) ? (
+                <a
+                  href={agent.external_rating_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm hover:text-grape transition-colors"
+                  aria-label={`Rated ${agent.external_rating} on ${agent.external_rating_source ?? 'external source'}, opens in new tab`}
+                >
+                  <Star size={16} className="text-amber-400 fill-amber-400" />
+                  <span className="font-bold text-ink">{agent.external_rating.toFixed(1)}</span>
+                  {agent.external_rating_count !== null && (
+                    <>
+                      <span className="text-muted/40">·</span>
+                      <span className="text-muted">{formatRatingCount(agent.external_rating_count)} ratings</span>
+                    </>
+                  )}
+                  {agent.external_rating_source && (
+                    <>
+                      <span className="text-muted/40">·</span>
+                      <span className="text-muted">{agent.external_rating_source}</span>
+                    </>
+                  )}
+                  <ExternalLink size={12} className="text-muted/60 ml-0.5" />
+                </a>
+              ) : null}
               </div>
             </div>
 

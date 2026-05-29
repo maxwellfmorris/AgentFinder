@@ -25,6 +25,16 @@ const PRICING_COLOR: Record<string, string> = {
   enterprise: 'bg-slate-100 text-slate-700',
 }
 
+// Compact count formatter: 181200 → "181k", 4100000 → "4.1M", 60 → "60"
+function formatRatingCount(n: number): string {
+  if (n >= 1_000_000) {
+    const m = (n / 1_000_000).toFixed(1)
+    return `${m.endsWith('.0') ? m.slice(0, -2) : m}M`
+  }
+  if (n >= 1_000) return `${Math.round(n / 1_000)}k`
+  return String(n)
+}
+
 export function AgentCard({ agent, onView }: AgentCardProps) {
   return (
     <div className="group relative bg-white rounded-3xl overflow-hidden shadow-[0_14px_34px_rgba(139,47,230,0.10)] hover:shadow-[0_20px_44px_rgba(139,47,230,0.16)] hover:-translate-y-0.5 transition-all flex flex-col">
@@ -82,9 +92,31 @@ export function AgentCard({ agent, onView }: AgentCardProps) {
                   ({agent.review_count.toLocaleString()})
                 </span>
               </div>
-            ) : (
-              <span className="text-xs text-muted/70">No reviews yet</span>
-            )}
+            ) : agent.external_rating !== null && agent.external_rating_url ? (
+              <a
+                href={agent.external_rating_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative z-10 inline-flex items-center gap-1 text-xs text-muted hover:text-grape transition-colors"
+                aria-label={`Rated ${agent.external_rating} on ${agent.external_rating_source ?? 'external source'}, opens in new tab`}
+              >
+                <Star size={12} className="text-amber-400 fill-amber-400" />
+                <span className="font-semibold text-ink/80">{agent.external_rating.toFixed(1)}</span>
+                {agent.external_rating_count !== null && (
+                  <>
+                    <span className="text-muted/40">·</span>
+                    <span>{formatRatingCount(agent.external_rating_count)}</span>
+                  </>
+                )}
+                {agent.external_rating_source && (
+                  <>
+                    <span className="text-muted/40">·</span>
+                    <span>{agent.external_rating_source}</span>
+                  </>
+                )}
+                <ExternalLink size={10} className="ml-0.5" />
+              </a>
+            ) : null}
           </div>
         </div>
 
