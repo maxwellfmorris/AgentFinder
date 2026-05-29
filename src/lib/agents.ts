@@ -423,3 +423,54 @@ export async function getTasksForAgent(agentId: string): Promise<AgentTask[]> {
     return []
   }
 }
+
+// Fetch multiple agents by slug in a single query (used by /compare).
+export async function getAgentsBySlugs(slugs: string[]): Promise<Agent[]> {
+  if (slugs.length === 0) return []
+  const supabase = getSupabaseClient()
+  if (!supabase) {
+    return PLACEHOLDER_AGENTS.filter((a) => slugs.includes(a.slug))
+  }
+  try {
+    const { data, error } = await supabase
+      .from('agents')
+      .select('*')
+      .in('slug', slugs)
+      .eq('status', 'published')
+    if (error) throw error
+    return (data ?? []) as Agent[]
+  } catch {
+    return PLACEHOLDER_AGENTS.filter((a) => slugs.includes(a.slug))
+  }
+}
+
+// Find same-category published agents (excluding the current one),
+// ordered by review_count. Used for "Compare: vs X · vs Y" on the detail page.
+export async function getSimilarAgents(
+  currentSlug: string,
+  category: string,
+  limit = 2,
+): Promise<Agent[]> {
+  const supabase = getSupabaseClient()
+  if (!supabase) {
+    return PLACEHOLDER_AGENTS
+      .filter((a) => a.category === category && a.slug !== currentSlug)
+      .slice(0, limit)
+  }
+  try {
+    const { data, error } = await supabase
+      .from('agents')
+      .select('*')
+      .eq('category', category)
+      .eq('status', 'published')
+      .neq('slug', currentSlug)
+      .order('review_count', { ascending: false })
+      .limit(limit)
+    if (error) throw error
+    return (data ?? []) as Agent[]
+  } catch {
+    return PLACEHOLDER_AGENTS
+      .filter((a) => a.category === category && a.slug !== currentSlug)
+      .slice(0, limit)
+  }
+}

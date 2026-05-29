@@ -12,7 +12,7 @@ import {
   Shield,
   Check,
 } from 'lucide-react'
-import { getAgentBySlug, getLatestEvalsForAgent, getReviewStatsForAgent } from '@/lib/agents'
+import { getAgentBySlug, getLatestEvalsForAgent, getReviewStatsForAgent, getSimilarAgents } from '@/lib/agents'
 import { PRICING_LABELS, COMPLEXITY_LABELS, COMPLEXITY_DESCRIPTIONS, TIER_DESCRIPTIONS } from '@/types/database'
 import { TierChip } from '@/components/TierChip'
 import { EvalRow } from '@/components/EvalRow'
@@ -62,9 +62,10 @@ export default async function AgentDetailPage({ params }: PageProps) {
   const agent = await getAgentBySlug(params.slug)
   if (!agent) notFound()
 
-  const [evals, reviewStats] = await Promise.all([
+  const [evals, reviewStats, similarAgents] = await Promise.all([
     getLatestEvalsForAgent(agent.id),
     getReviewStatsForAgent(agent.id),
+    getSimilarAgents(agent.slug, agent.category, 2),
   ])
 
   const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://agentfinder.com'
@@ -218,6 +219,35 @@ export default async function AgentDetailPage({ params }: PageProps) {
             )}
           </div>
         </div>
+
+        {/* Compare: small inline links right under the hero */}
+        {similarAgents.length > 0 && (
+          <div className="px-6 sm:px-8 py-3 border-b border-grape/10 text-xs text-muted">
+            <span className="font-semibold uppercase tracking-wider text-muted/80 mr-2">Compare:</span>
+            {similarAgents.map((other, i) => (
+              <span key={other.slug}>
+                {i > 0 && <span className="text-muted/40"> · </span>}
+                <Link
+                  href={`/compare?agents=${agent.slug},${other.slug}`}
+                  className="text-grape hover:text-punch font-semibold"
+                >
+                  vs {other.name}
+                </Link>
+              </span>
+            ))}
+            {similarAgents.length > 1 && (
+              <>
+                <span className="text-muted/40"> · </span>
+                <Link
+                  href={`/compare?agents=${agent.slug},${similarAgents.map((s) => s.slug).join(',')}`}
+                  className="text-grape hover:text-punch font-semibold"
+                >
+                  Compare all
+                </Link>
+              </>
+            )}
+          </div>
+        )}
 
         {/* Good for — desktop: full-width above the details grid (mobile copy lives inside the grid below) */}
         {useCases.length > 0 && (
