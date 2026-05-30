@@ -26,6 +26,7 @@ export interface Agent {
   featured_tier: FeaturedTier
   status: AgentStatus
   use_cases: string[]
+  limitations: string[]
   external_rating: number | null
   external_rating_count: number | null
   external_rating_source: string | null

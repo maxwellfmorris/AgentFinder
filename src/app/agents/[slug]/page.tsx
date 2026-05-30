@@ -11,6 +11,8 @@ import {
   Building2,
   Shield,
   Check,
+  Info,
+  ChevronDown,
 } from 'lucide-react'
 import { getAgentBySlug, getLatestEvalsForAgent, getReviewStatsForAgent, getSimilarAgents } from '@/lib/agents'
 import { PRICING_LABELS, COMPLEXITY_LABELS, COMPLEXITY_DESCRIPTIONS, TIER_DESCRIPTIONS } from '@/types/database'
@@ -100,8 +102,9 @@ export default async function AgentDetailPage({ params }: PageProps) {
     high: 'bg-red-100 text-red-800',
   }[agent.setup_complexity]
 
-  // Defensive: tolerate rows from before the use_cases column existed
+  // Defensive: tolerate rows from before the use_cases / limitations columns existed
   const useCases = agent.use_cases ?? []
+  const limitations = agent.limitations ?? []
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -331,6 +334,25 @@ export default async function AgentDetailPage({ params }: PageProps) {
             </dl>
           </div>
         </div>
+
+        {/* Things to know — collapsed editorial caveats; native <details> for zero JS */}
+        {limitations.length > 0 && (
+          <details className="border-t border-grape/10 group">
+            <summary className="flex items-center gap-2 cursor-pointer px-6 sm:px-8 py-3 text-xs font-bold text-muted uppercase tracking-wider hover:text-grape transition-colors list-none [&::-webkit-details-marker]:hidden">
+              <Info size={14} className="text-muted/60" />
+              <span>Things to know</span>
+              <ChevronDown size={14} className="ml-auto text-muted/60 transition-transform group-open:rotate-180" />
+            </summary>
+            <ul className="px-6 sm:px-8 pb-5 pt-1 space-y-1.5">
+              {limitations.map((lim) => (
+                <li key={lim} className="flex items-start gap-2 text-sm text-muted leading-relaxed">
+                  <span className="text-muted/40 flex-shrink-0">·</span>
+                  <span>{lim}</span>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
       </div>
 
       {/* Performance */}
