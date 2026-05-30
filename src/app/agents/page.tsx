@@ -1,4 +1,6 @@
 import { Suspense } from 'react'
+import Link from 'next/link'
+import { Rocket, ArrowRight } from 'lucide-react'
 import { getAgents, getFeaturedAgents } from '@/lib/agents'
 import { logSearchEvent } from '@/lib/events'
 import { AgentCard } from '@/components/AgentCard'
@@ -141,6 +143,30 @@ export default async function AgentsPage({ searchParams }: PageProps) {
               ))}
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Self-submission CTA — gentle, founder-facing */}
+      <div className="mt-12 bg-gradient-to-r from-cream via-white to-grape/5 border border-grape/15 rounded-2xl p-6 sm:p-7">
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+          <div className="flex-shrink-0 w-12 h-12 bg-grape/10 rounded-xl flex items-center justify-center">
+            <Rocket size={22} className="text-grape" />
+          </div>
+          <div className="flex-1 text-center sm:text-left">
+            <h2 className="font-display text-lg font-bold text-ink mb-1">
+              Building an AI agent?
+            </h2>
+            <p className="text-muted text-sm">
+              List yours on AgentFinder — free to submit, reviewed within a few days.
+            </p>
+          </div>
+          <Link
+            href="/submit"
+            className="flex-shrink-0 inline-flex items-center gap-2 bg-grape text-white font-semibold text-sm px-5 py-2.5 rounded-full hover:brightness-110 transition"
+          >
+            Submit your agent
+            <ArrowRight size={16} />
+          </Link>
         </div>
       </div>
     </div>
