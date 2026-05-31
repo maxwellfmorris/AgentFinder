@@ -31,6 +31,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     external_rating_count: null,
     external_rating_source: null,
     external_rating_url: null,
+    affiliate_url: null,
   },
   {
     id: '2',
@@ -60,6 +61,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     external_rating_count: null,
     external_rating_source: null,
     external_rating_url: null,
+    affiliate_url: null,
   },
   {
     id: '3',
@@ -89,6 +91,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     external_rating_count: null,
     external_rating_source: null,
     external_rating_url: null,
+    affiliate_url: null,
   },
   {
     id: '4',
@@ -118,6 +121,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     external_rating_count: null,
     external_rating_source: null,
     external_rating_url: null,
+    affiliate_url: null,
   },
   {
     id: '5',
@@ -147,6 +151,7 @@ export const PLACEHOLDER_AGENTS: Agent[] = [
     external_rating_count: null,
     external_rating_source: null,
     external_rating_url: null,
+    affiliate_url: null,
   },
 ]
 
@@ -478,4 +483,11 @@ export async function getSimilarAgents(
       .filter((a) => a.category === category && a.slug !== currentSlug)
       .slice(0, limit)
   }
+}
+
+// Pick the right outbound URL for an agent: affiliate when present, raw
+// website otherwise. Returns isAffiliate so the UI can show disclosure.
+export function getOutboundUrl(agent: Agent): { url: string; isAffiliate: boolean } {
+  if (agent.affiliate_url) return { url: agent.affiliate_url, isAffiliate: true }
+  return { url: agent.website ?? '#', isAffiliate: false }
 }

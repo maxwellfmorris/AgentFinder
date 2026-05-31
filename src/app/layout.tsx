@@ -58,6 +58,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/feedback" className="hover:text-grape transition-colors">
                   Send feedback
                 </Link>
+                <Link href="/disclosure" className="hover:text-grape transition-colors">
+                  Affiliate disclosure
+                </Link>
                 <span>© 2026 AgentFinder · Find AI agents that fit your life.</span>
               </div>
             </div>

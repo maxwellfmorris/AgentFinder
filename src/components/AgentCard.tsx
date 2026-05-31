@@ -3,7 +3,9 @@ import Link from 'next/link'
 import { Star, ExternalLink, Zap } from 'lucide-react'
 import type { Agent } from '@/types/database'
 import { PRICING_LABELS, COMPLEXITY_LABELS } from '@/types/database'
+import { getOutboundUrl } from '@/lib/agents'
 import { TierChip } from './TierChip'
+import { OutboundLink } from './OutboundLink'
 
 interface AgentCardProps {
   agent: Agent
@@ -36,6 +38,7 @@ function formatRatingCount(n: number): string {
 }
 
 export function AgentCard({ agent, onView }: AgentCardProps) {
+  const outbound = getOutboundUrl(agent)
   return (
     <div className="group relative bg-white rounded-3xl overflow-hidden shadow-[0_14px_34px_rgba(139,47,230,0.10)] hover:shadow-[0_20px_44px_rgba(139,47,230,0.16)] hover:-translate-y-0.5 transition-all flex flex-col">
       {/* Signature top accent */}
@@ -175,16 +178,25 @@ export function AgentCard({ agent, onView }: AgentCardProps) {
           >
             View Details
           </Link>
-          {agent.website && (
-            <a
-              href={agent.website}
-              target="_blank"
-              rel="noopener noreferrer"
+          {outbound.url !== '#' && (
+            <OutboundLink
+              agentId={agent.id}
+              url={outbound.url}
+              isAffiliate={outbound.isAffiliate}
+              source="card"
               className="relative z-10 flex-shrink-0 p-2 text-muted hover:text-grape border border-grape/15 rounded-full hover:bg-grape/5 transition-colors"
-              aria-label={`Visit ${agent.name} website`}
+              ariaLabel={`Visit ${agent.name} website${outbound.isAffiliate ? ' (affiliate link)' : ''}`}
             >
-              <ExternalLink size={15} />
-            </a>
+              <span className="relative inline-flex">
+                <ExternalLink size={15} />
+                {outbound.isAffiliate && (
+                  <span
+                    className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-grape rounded-full"
+                    aria-hidden="true"
+                  />
+                )}
+              </span>
+            </OutboundLink>
           )}
         </div>
       </div>

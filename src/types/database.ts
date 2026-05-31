@@ -31,6 +31,17 @@ export interface Agent {
   external_rating_count: number | null
   external_rating_source: string | null
   external_rating_url: string | null
+  affiliate_url: string | null
+}
+
+export interface OutboundClick {
+  id: string
+  created_at: string
+  agent_id: string
+  source: 'card' | 'detail' | 'compare'
+  was_affiliate: boolean
+  session_id: string | null
+  user_id: string | null
 }
 
 export function isFeatured(agent: { featured_until: string | null }): boolean {
@@ -169,6 +180,12 @@ export type Database = {
         Row: Feedback & Record<string, unknown>
         Insert: Omit<Feedback, 'id' | 'created_at'> & Record<string, unknown>
         Update: Partial<Omit<Feedback, 'id' | 'created_at'>> & Record<string, unknown>
+        Relationships: []
+      }
+      outbound_clicks: {
+        Row: OutboundClick & Record<string, unknown>
+        Insert: Omit<OutboundClick, 'id' | 'created_at'> & Record<string, unknown>
+        Update: Partial<Omit<OutboundClick, 'id' | 'created_at'>> & Record<string, unknown>
         Relationships: []
       }
     }

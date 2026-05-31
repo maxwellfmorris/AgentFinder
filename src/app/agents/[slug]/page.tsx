@@ -14,11 +14,12 @@ import {
   Info,
   ChevronDown,
 } from 'lucide-react'
-import { getAgentBySlug, getLatestEvalsForAgent, getReviewStatsForAgent, getSimilarAgents } from '@/lib/agents'
+import { getAgentBySlug, getLatestEvalsForAgent, getReviewStatsForAgent, getSimilarAgents, getOutboundUrl } from '@/lib/agents'
 import { PRICING_LABELS, COMPLEXITY_LABELS, COMPLEXITY_DESCRIPTIONS, TIER_DESCRIPTIONS } from '@/types/database'
 import { TierChip } from '@/components/TierChip'
 import { EvalRow } from '@/components/EvalRow'
 import { ReviewsSection } from '@/components/ReviewsSection'
+import { OutboundLink } from '@/components/OutboundLink'
 
 // Compact count formatter: 181200 → "181k", 4100000 → "4.1M", 60 → "60"
 function formatRatingCount(n: number): string {
@@ -105,6 +106,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
   // Defensive: tolerate rows from before the use_cases / limitations columns existed
   const useCases = agent.use_cases ?? []
   const limitations = agent.limitations ?? []
+  const outbound = getOutboundUrl(agent)
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -209,16 +211,28 @@ export default async function AgentDetailPage({ params }: PageProps) {
               </div>
             </div>
 
-            {agent.website && (
-              <a
-                href={agent.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-shrink-0 inline-flex items-center justify-center gap-2 bg-butter text-ink font-semibold text-sm px-5 py-2.5 rounded-full hover:brightness-105 transition shadow-sm shadow-punch/20 w-full lg:w-auto"
-              >
-                Visit Website
-                <ExternalLink size={14} />
-              </a>
+            {outbound.url !== '#' && (
+              <div className="flex-shrink-0 w-full lg:w-auto">
+                <OutboundLink
+                  agentId={agent.id}
+                  url={outbound.url}
+                  isAffiliate={outbound.isAffiliate}
+                  source="detail"
+                  className="inline-flex items-center justify-center gap-2 bg-butter text-ink font-semibold text-sm px-5 py-2.5 rounded-full hover:brightness-105 transition shadow-sm shadow-punch/20 w-full lg:w-auto"
+                  ariaLabel={`Visit ${agent.name} website${outbound.isAffiliate ? ' (affiliate link)' : ''}`}
+                >
+                  Visit Website
+                  <ExternalLink size={14} />
+                </OutboundLink>
+                {outbound.isAffiliate && (
+                  <p className="text-xs italic text-muted/70 mt-1.5 text-center lg:text-right">
+                    Affiliate link ·{' '}
+                    <Link href="/disclosure" className="underline hover:text-grape">
+                      how this works
+                    </Link>
+                  </p>
+                )}
+              </div>
             )}
           </div>
         </div>

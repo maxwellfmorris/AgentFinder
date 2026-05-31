@@ -2,10 +2,11 @@ import { Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, Star, ExternalLink, Check } from 'lucide-react'
-import { getAgentsBySlugs } from '@/lib/agents'
+import { getAgentsBySlugs, getOutboundUrl } from '@/lib/agents'
 import { PRICING_LABELS, COMPLEXITY_LABELS } from '@/types/database'
 import type { Agent } from '@/types/database'
 import { TierChip } from '@/components/TierChip'
+import { OutboundLink } from '@/components/OutboundLink'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -121,6 +122,7 @@ function EmptyState() {
 }
 
 function CompareColumn({ agent }: { agent: Agent }) {
+  const outbound = getOutboundUrl(agent)
   return (
     <div className="bg-white rounded-3xl overflow-hidden shadow-[0_14px_34px_rgba(139,47,230,0.10)] flex flex-col">
       {/* Signature top accent */}
@@ -256,16 +258,28 @@ function CompareColumn({ agent }: { agent: Agent }) {
 
         {/* CTAs */}
         <div className="mt-auto pt-5 space-y-2.5">
-          {agent.website && (
-            <a
-              href={agent.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full inline-flex items-center justify-center gap-2 bg-butter text-ink font-semibold text-sm px-5 py-2.5 rounded-full hover:brightness-105 transition shadow-sm shadow-punch/20"
-            >
-              Visit Website
-              <ExternalLink size={14} />
-            </a>
+          {outbound.url !== '#' && (
+            <div>
+              <OutboundLink
+                agentId={agent.id}
+                url={outbound.url}
+                isAffiliate={outbound.isAffiliate}
+                source="compare"
+                className="w-full inline-flex items-center justify-center gap-2 bg-butter text-ink font-semibold text-sm px-5 py-2.5 rounded-full hover:brightness-105 transition shadow-sm shadow-punch/20"
+                ariaLabel={`Visit ${agent.name} website${outbound.isAffiliate ? ' (affiliate link)' : ''}`}
+              >
+                Visit Website
+                <ExternalLink size={14} />
+              </OutboundLink>
+              {outbound.isAffiliate && (
+                <p className="text-xs italic text-muted/70 mt-1.5 text-center">
+                  Affiliate link ·{' '}
+                  <Link href="/disclosure" className="underline hover:text-grape">
+                    how this works
+                  </Link>
+                </p>
+              )}
+            </div>
           )}
           <Link
             href={`/agents/${agent.slug}`}

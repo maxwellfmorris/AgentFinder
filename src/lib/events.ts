@@ -52,3 +52,30 @@ export async function logClickEvent({
     // fire-and-forget
   }
 }
+
+// Outbound click logging — fires when a user taps "Visit Website" anywhere
+// on the site. Records source (which surface), and whether the link was
+// affiliate-rewritten (for revenue attribution).
+export async function logOutboundClick({
+  agentId,
+  source,
+  wasAffiliate,
+}: {
+  agentId: string
+  source: 'card' | 'detail' | 'compare'
+  wasAffiliate: boolean
+}): Promise<void> {
+  try {
+    const supabase = getSupabaseServer()
+    const { data: { user } } = await supabase.auth.getUser()
+    await supabase.from('outbound_clicks').insert({
+      agent_id: agentId,
+      source,
+      was_affiliate: wasAffiliate,
+      session_id: getSessionId(),
+      user_id: user?.id ?? null,
+    })
+  } catch {
+    // fire-and-forget — logging failures must never block the outbound click
+  }
+}
