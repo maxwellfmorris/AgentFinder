@@ -55,6 +55,7 @@ export function ReviewsList({ agentId, refreshKey }: ReviewsListProps) {
       .from('reviews')
       .select('id, created_at, user_email, rating, body, usage_claim, months_used, incentivized')
       .eq('agent_id', agentId)
+      .eq('approved', true)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
         setReviews((data as Review[]) ?? [])

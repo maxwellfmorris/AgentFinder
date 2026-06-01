@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Star, Loader2 } from 'lucide-react'
+import { Star, Loader2, Sparkles } from 'lucide-react'
 import { useAuth } from './AuthProvider'
 import { SignInModal } from './SignInModal'
 import { getSupabaseBrowser } from '@/lib/supabase-browser'
@@ -10,12 +10,19 @@ import { USAGE_CLAIM_LABELS, isVerifiedUsage } from '@/types/database'
 
 interface ReviewFormProps {
   agentId: string
+  workshopActive?: boolean
+  creditType?: string | null
   onReviewSubmitted: () => void
 }
 
 const USAGE_ORDER: UsageClaim[] = ['paying', 'free_trial', 'evaluating', 'none']
 
-export function ReviewForm({ agentId, onReviewSubmitted }: ReviewFormProps) {
+export function ReviewForm({
+  agentId,
+  workshopActive = false,
+  creditType = null,
+  onReviewSubmitted,
+}: ReviewFormProps) {
   const { user } = useAuth()
   const [showSignIn, setShowSignIn] = useState(false)
   const [usageClaim, setUsageClaim] = useState<UsageClaim | null>(null)
@@ -23,6 +30,8 @@ export function ReviewForm({ agentId, onReviewSubmitted }: ReviewFormProps) {
   const [rating, setRating] = useState(0)
   const [hovered, setHovered] = useState(0)
   const [body, setBody] = useState('')
+  const [usageProof, setUsageProof] = useState('')
+  const [usageProofUrl, setUsageProofUrl] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const supabase = getSupabaseBrowser()
@@ -31,8 +40,16 @@ export function ReviewForm({ agentId, onReviewSubmitted }: ReviewFormProps) {
     return (
       <>
         <div className="bg-cream rounded-2xl border border-grape/10 p-6 text-center">
-          <p className="text-ink/80 font-medium mb-1">Have experience with this agent?</p>
-          <p className="text-muted/70 text-sm mb-4">Sign in to leave a review — it takes 30 seconds.</p>
+          <p className="text-ink/80 font-medium mb-1">
+            {workshopActive
+              ? `Have you tried this agent? Sign in to review and earn ${creditType ?? 'credit'}.`
+              : 'Have experience with this agent?'}
+          </p>
+          <p className="text-muted/70 text-sm mb-4">
+            {workshopActive
+              ? 'Verified reviews earn credits with the developer once approved.'
+              : 'Sign in to leave a review — it takes 30 seconds.'}
+          </p>
           <button
             onClick={() => setShowSignIn(true)}
             className="bg-grape text-white font-semibold text-sm px-6 py-2.5 rounded-full hover:brightness-110 transition"
@@ -46,7 +63,15 @@ export function ReviewForm({ agentId, onReviewSubmitted }: ReviewFormProps) {
   }
 
   if (status === 'success') {
-    return (
+    return workshopActive ? (
+      <div className="bg-grape/5 border border-grape/20 rounded-2xl p-6 text-center">
+        <Sparkles size={20} className="text-grape mx-auto mb-2" />
+        <p className="font-semibold text-ink">Submitted — your review is pending verification.</p>
+        <p className="text-muted text-sm mt-1">
+          Once approved, your {creditType ?? 'credit'} will appear on this page.
+        </p>
+      </div>
+    ) : (
       <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center">
         <p className="font-semibold text-emerald-800">Thanks for your review!</p>
         <p className="text-emerald-600 text-sm mt-1">It&apos;s now live on this page.</p>
@@ -64,15 +89,17 @@ export function ReviewForm({ agentId, onReviewSubmitted }: ReviewFormProps) {
       setErrorMsg('Please select a star rating.')
       return
     }
+    if (workshopActive && !usageProof.trim()) {
+      setErrorMsg('Please describe how you used the agent — this helps us verify your review.')
+      return
+    }
     setStatus('loading')
     setErrorMsg('')
 
-    const months = isVerifiedUsage(usageClaim) && monthsUsed !== ''
-      ? parseInt(monthsUsed, 10)
-      : null
+    const months =
+      isVerifiedUsage(usageClaim) && monthsUsed !== '' ? parseInt(monthsUsed, 10) : null
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.from('reviews') as any).insert({
+    const payload: Record<string, unknown> = {
       agent_id: agentId,
       user_id: user!.id,
       user_email: user!.email!,
@@ -80,7 +107,16 @@ export function ReviewForm({ agentId, onReviewSubmitted }: ReviewFormProps) {
       body,
       usage_claim: usageClaim,
       months_used: months,
-    })
+    }
+    if (workshopActive) {
+      payload.incentivized = true
+      payload.approved = false
+      payload.usage_proof = usageProof.trim()
+      payload.usage_proof_url = usageProofUrl.trim() || null
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from('reviews') as any).insert(payload)
 
     if (error) {
       if (error.code === '23505') {
@@ -97,7 +133,17 @@ export function ReviewForm({ agentId, onReviewSubmitted }: ReviewFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-grape/10 p-6 space-y-4">
-      <h3 className="font-display font-bold text-ink">Write a review</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="font-display font-bold text-ink">
+          {workshopActive ? `Earn ${creditType ?? 'credit'} for a review` : 'Write a review'}
+        </h3>
+        {workshopActive && (
+          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-grape/10 text-grape">
+            <Sparkles size={10} />
+            Workshop
+          </span>
+        )}
+      </div>
 
       {/* Usage claim */}
       <div>
@@ -173,6 +219,38 @@ export function ReviewForm({ agentId, onReviewSubmitted }: ReviewFormProps) {
         />
       </div>
 
+      {/* Workshop-only usage proof fields */}
+      {workshopActive && (
+        <>
+          <div>
+            <p className="text-sm text-muted mb-2">
+              How did you use this agent? <span className="text-red-500">*</span>
+            </p>
+            <textarea
+              required
+              rows={2}
+              value={usageProof}
+              onChange={(e) => setUsageProof(e.target.value)}
+              placeholder="A short, specific description of what you actually did with it — this helps us verify you really used it before sending your credit."
+              className="w-full px-4 py-3 bg-cream border border-grape/15 rounded-xl text-sm text-ink placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-grape focus:border-transparent resize-none"
+            />
+          </div>
+
+          <div>
+            <p className="text-sm text-muted mb-2">
+              Link to a screenshot or confirmation email <span className="text-muted/70">(optional)</span>
+            </p>
+            <input
+              type="url"
+              value={usageProofUrl}
+              onChange={(e) => setUsageProofUrl(e.target.value)}
+              placeholder="https://..."
+              className="w-full px-4 py-3 bg-cream border border-grape/15 rounded-xl text-sm text-ink placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-grape focus:border-transparent"
+            />
+          </div>
+        </>
+      )}
+
       {errorMsg && (
         <p className="text-sm text-red-600">{errorMsg}</p>
       )}
@@ -186,6 +264,8 @@ export function ReviewForm({ agentId, onReviewSubmitted }: ReviewFormProps) {
         >
           {status === 'loading' ? (
             <><Loader2 size={14} className="animate-spin" /> Submitting...</>
+          ) : workshopActive ? (
+            `Submit for ${creditType ?? 'credit'}`
           ) : (
             'Submit review'
           )}

@@ -6,17 +6,21 @@ import { ReviewsList } from './ReviewsList'
 
 interface ReviewsSectionProps {
   agentId: string
+  workshopActive?: boolean
+  creditType?: string | null
 }
 
-export function ReviewsSection({ agentId }: ReviewsSectionProps) {
+export function ReviewsSection({ agentId, workshopActive = false, creditType = null }: ReviewsSectionProps) {
   const [refreshKey, setRefreshKey] = useState(0)
 
   return (
-    <div className="bg-white rounded-2xl border border-grape/10 shadow-[0_8px_20px_rgba(255,107,74,0.06)] p-8">
+    <div id="reviews" className="bg-white rounded-2xl border border-grape/10 shadow-[0_8px_20px_rgba(255,107,74,0.06)] p-8 scroll-mt-24">
       <h2 className="font-display text-lg font-bold text-ink mb-6">Reviews</h2>
       <div className="space-y-6">
         <ReviewForm
           agentId={agentId}
+          workshopActive={workshopActive}
+          creditType={creditType}
           onReviewSubmitted={() => setRefreshKey((k) => k + 1)}
         />
         <ReviewsList agentId={agentId} refreshKey={refreshKey} />

@@ -90,6 +90,9 @@ export interface Review {
   usage_claim: UsageClaim
   months_used: number | null
   incentivized: boolean
+  approved: boolean
+  usage_proof: string | null
+  usage_proof_url: string | null
 }
 
 export interface AgentTask {

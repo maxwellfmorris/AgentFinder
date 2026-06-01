@@ -16,6 +16,7 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { getAgentBySlug, getLatestEvalsForAgent, getReviewStatsForAgent, getSimilarAgents, getOutboundUrl } from '@/lib/agents'
+import { getSupabaseServer } from '@/lib/supabase-server'
 import { PRICING_LABELS, COMPLEXITY_LABELS, COMPLEXITY_DESCRIPTIONS, TIER_DESCRIPTIONS } from '@/types/database'
 import { TierChip } from '@/components/TierChip'
 import { EvalRow } from '@/components/EvalRow'
@@ -71,6 +72,40 @@ export default async function AgentDetailPage({ params }: PageProps) {
     getReviewStatsForAgent(agent.id),
     getSimilarAgents(agent.slug, agent.category, 2),
   ])
+
+  // Workshop user state — only when the agent is enrolled and the user is signed in.
+  // Drives the three-way callout (offer / pending / earned).
+  const workshopActive = agent.workshop_active && !agent.workshop_paused
+  let workshopUserState: 'none' | 'pending' | 'earned' = 'none'
+  let earnedCode: string | null = null
+  if (workshopActive) {
+    const supabase = getSupabaseServer()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (user) {
+      const { data: code } = await supabase
+        .from('workshop_credit_codes')
+        .select('code')
+        .eq('agent_id', agent.id)
+        .eq('claimed_by_user_id', user.id)
+        .maybeSingle()
+      if (code) {
+        workshopUserState = 'earned'
+        earnedCode = (code as { code: string }).code
+      } else {
+        const { data: pending } = await supabase
+          .from('reviews')
+          .select('id')
+          .eq('agent_id', agent.id)
+          .eq('user_id', user.id)
+          .eq('incentivized', true)
+          .eq('approved', false)
+          .maybeSingle()
+        if (pending) workshopUserState = 'pending'
+      }
+    }
+  }
 
   const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://agentfinder.com'
 
@@ -267,21 +302,59 @@ export default async function AgentDetailPage({ params }: PageProps) {
           </div>
         )}
 
-        {/* Workshop campaign callout — visible when the agent is enrolled */}
-        {agent.workshop_active && !agent.workshop_paused && (
+        {/* Workshop campaign callout — three states: offer / pending / earned */}
+        {workshopActive && (
           <div className="px-6 sm:px-8 py-4 border-b border-grape/10 bg-grape/5">
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 mt-0.5">
                 <Sparkles size={18} className="text-grape" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-display text-sm font-bold text-ink mb-0.5">
-                  Workshop campaign · Earn {agent.workshop_credit_type ?? 'credits'} for a verified review
-                </h3>
-                <p className="text-xs text-muted leading-relaxed">
-                  {agent.workshop_credit_redemption_instructions ??
-                    'Use the agent, submit an honest review, and earn credits with the developer once verified.'}
-                </p>
+                {workshopUserState === 'earned' && earnedCode ? (
+                  <>
+                    <h3 className="font-display text-sm font-bold text-ink mb-1">
+                      You earned {agent.workshop_credit_type ?? 'credit'}
+                    </h3>
+                    <p className="text-xs text-muted leading-relaxed mb-1.5">
+                      Your code:{' '}
+                      <code className="px-2 py-0.5 rounded bg-white border border-grape/20 font-mono text-ink text-sm">
+                        {earnedCode}
+                      </code>
+                    </p>
+                    {agent.workshop_credit_redemption_url && (
+                      <a
+                        href={agent.workshop_credit_redemption_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-grape hover:text-punch"
+                      >
+                        Redeem now <ExternalLink size={11} />
+                      </a>
+                    )}
+                  </>
+                ) : workshopUserState === 'pending' ? (
+                  <>
+                    <h3 className="font-display text-sm font-bold text-ink mb-0.5">
+                      Your review is awaiting verification
+                    </h3>
+                    <p className="text-xs text-muted leading-relaxed">
+                      Once approved, your {agent.workshop_credit_type ?? 'credit'} will appear here.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="font-display text-sm font-bold text-ink mb-0.5">
+                      Workshop campaign · Earn {agent.workshop_credit_type ?? 'credits'} for a verified review
+                    </h3>
+                    <p className="text-xs text-muted leading-relaxed">
+                      {agent.workshop_credit_redemption_instructions ??
+                        'Use the agent, submit an honest review, and earn credits with the developer once verified.'}{' '}
+                      <Link href="#reviews" className="font-semibold text-grape hover:text-punch underline">
+                        Submit a review →
+                      </Link>
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -410,7 +483,11 @@ export default async function AgentDetailPage({ params }: PageProps) {
 
       {/* Reviews */}
       <div className="mt-8">
-        <ReviewsSection agentId={agent.id} />
+        <ReviewsSection
+          agentId={agent.id}
+          workshopActive={workshopActive}
+          creditType={agent.workshop_credit_type}
+        />
       </div>
 
       {/* Back CTA */}
