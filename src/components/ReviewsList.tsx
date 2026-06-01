@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Star } from 'lucide-react'
+import { Star, Sparkles } from 'lucide-react'
 import { getSupabaseBrowser } from '@/lib/supabase-browser'
 import type { UsageClaim } from '@/types/database'
 import { isVerifiedUsage } from '@/types/database'
@@ -14,6 +14,7 @@ interface Review {
   body: string
   usage_claim: UsageClaim
   months_used: number | null
+  incentivized: boolean
 }
 
 interface ReviewsListProps {
@@ -32,6 +33,18 @@ function VerifiedChip({ claim, months }: { claim: UsageClaim; months: number | n
   )
 }
 
+function IncentivizedChip() {
+  return (
+    <span
+      className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-butter/30 text-ink/80"
+      title="Submitted through the Workshop program — reviewer earned credits"
+    >
+      <Sparkles size={10} />
+      Incentivized · Workshop
+    </span>
+  )
+}
+
 export function ReviewsList({ agentId, refreshKey }: ReviewsListProps) {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
@@ -40,7 +53,7 @@ export function ReviewsList({ agentId, refreshKey }: ReviewsListProps) {
   useEffect(() => {
     supabase
       .from('reviews')
-      .select('id, created_at, user_email, rating, body, usage_claim, months_used')
+      .select('id, created_at, user_email, rating, body, usage_claim, months_used, incentivized')
       .eq('agent_id', agentId)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
@@ -79,6 +92,7 @@ export function ReviewsList({ agentId, refreshKey }: ReviewsListProps) {
                   })}
                 </p>
                 <VerifiedChip claim={review.usage_claim} months={review.months_used} />
+                {review.incentivized && <IncentivizedChip />}
               </div>
             </div>
             <div className="flex gap-0.5 flex-shrink-0">

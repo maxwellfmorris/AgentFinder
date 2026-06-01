@@ -13,6 +13,7 @@ import {
   Check,
   Info,
   ChevronDown,
+  Sparkles,
 } from 'lucide-react'
 import { getAgentBySlug, getLatestEvalsForAgent, getReviewStatsForAgent, getSimilarAgents, getOutboundUrl } from '@/lib/agents'
 import { PRICING_LABELS, COMPLEXITY_LABELS, COMPLEXITY_DESCRIPTIONS, TIER_DESCRIPTIONS } from '@/types/database'
@@ -263,6 +264,26 @@ export default async function AgentDetailPage({ params }: PageProps) {
                 </Link>
               </>
             )}
+          </div>
+        )}
+
+        {/* Workshop campaign callout — visible when the agent is enrolled */}
+        {agent.workshop_active && !agent.workshop_paused && (
+          <div className="px-6 sm:px-8 py-4 border-b border-grape/10 bg-grape/5">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 mt-0.5">
+                <Sparkles size={18} className="text-grape" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-display text-sm font-bold text-ink mb-0.5">
+                  Workshop campaign · Earn {agent.workshop_credit_type ?? 'credits'} for a verified review
+                </h3>
+                <p className="text-xs text-muted leading-relaxed">
+                  {agent.workshop_credit_redemption_instructions ??
+                    'Use the agent, submit an honest review, and earn credits with the developer once verified.'}
+                </p>
+              </div>
+            </div>
           </div>
         )}
 

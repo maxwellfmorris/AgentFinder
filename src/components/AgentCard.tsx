@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Star, ExternalLink, Zap } from 'lucide-react'
+import { Star, ExternalLink, Zap, Sparkles } from 'lucide-react'
 import type { Agent } from '@/types/database'
 import { PRICING_LABELS, COMPLEXITY_LABELS } from '@/types/database'
 import { getOutboundUrl } from '@/lib/agents'
@@ -122,6 +122,14 @@ export function AgentCard({ agent, onView }: AgentCardProps) {
             ) : null}
           </div>
         </div>
+
+        {/* Workshop campaign signal */}
+        {agent.workshop_active && !agent.workshop_paused && (
+          <div className="inline-flex items-center gap-1.5 bg-grape/10 text-grape rounded-full px-2.5 py-1 mb-2 text-xs font-semibold w-fit">
+            <Sparkles size={10} />
+            Workshop · Earn {agent.workshop_credit_type ?? 'credit'}
+          </div>
+        )}
 
         {/* Tagline */}
         <p className="text-sm font-semibold text-ink mb-2 line-clamp-2">{agent.tagline}</p>

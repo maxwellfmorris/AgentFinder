@@ -32,6 +32,24 @@ export interface Agent {
   external_rating_source: string | null
   external_rating_url: string | null
   affiliate_url: string | null
+  workshop_active: boolean
+  workshop_credit_amount: number | null
+  workshop_credit_type: string | null
+  workshop_credit_redemption_url: string | null
+  workshop_credit_redemption_instructions: string | null
+  workshop_target_reviews: number | null
+  workshop_reviews_remaining: number | null
+  workshop_started_at: string | null
+  workshop_paused: boolean
+}
+
+export interface WorkshopCreditCode {
+  id: string
+  created_at: string
+  agent_id: string
+  code: string
+  claimed_by_user_id: string | null
+  claimed_at: string | null
 }
 
 export interface OutboundClick {
@@ -71,6 +89,7 @@ export interface Review {
   body: string
   usage_claim: UsageClaim
   months_used: number | null
+  incentivized: boolean
 }
 
 export interface AgentTask {
@@ -186,6 +205,12 @@ export type Database = {
         Row: OutboundClick & Record<string, unknown>
         Insert: Omit<OutboundClick, 'id' | 'created_at'> & Record<string, unknown>
         Update: Partial<Omit<OutboundClick, 'id' | 'created_at'>> & Record<string, unknown>
+        Relationships: []
+      }
+      workshop_credit_codes: {
+        Row: WorkshopCreditCode & Record<string, unknown>
+        Insert: Omit<WorkshopCreditCode, 'id' | 'created_at'> & Record<string, unknown>
+        Update: Partial<Omit<WorkshopCreditCode, 'id' | 'created_at'>> & Record<string, unknown>
         Relationships: []
       }
     }
