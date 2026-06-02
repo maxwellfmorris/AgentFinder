@@ -15,7 +15,7 @@ import {
   ChevronDown,
   Sparkles,
 } from 'lucide-react'
-import { getAgentBySlug, getLatestEvalsForAgent, getReviewStatsForAgent, getSimilarAgents, getOutboundUrl } from '@/lib/agents'
+import { getAgentBySlug, getFeedbackDimensions, getLatestEvalsForAgent, getReviewStatsForAgent, getSimilarAgents, getOutboundUrl } from '@/lib/agents'
 import { getSupabaseServer } from '@/lib/supabase-server'
 import { PRICING_LABELS, COMPLEXITY_LABELS, COMPLEXITY_DESCRIPTIONS, TIER_DESCRIPTIONS } from '@/types/database'
 import { TierChip } from '@/components/TierChip'
@@ -67,10 +67,11 @@ export default async function AgentDetailPage({ params }: PageProps) {
   const agent = await getAgentBySlug(params.slug)
   if (!agent) notFound()
 
-  const [evals, reviewStats, similarAgents] = await Promise.all([
+  const [evals, reviewStats, similarAgents, feedbackDimensions] = await Promise.all([
     getLatestEvalsForAgent(agent.id),
     getReviewStatsForAgent(agent.id),
     getSimilarAgents(agent.slug, agent.category, 2),
+    getFeedbackDimensions(agent.id),
   ])
 
   // Workshop user state — only when the agent is enrolled and the user is signed in.
@@ -487,6 +488,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
           agentId={agent.id}
           workshopActive={workshopActive}
           creditType={agent.workshop_credit_type}
+          feedbackDimensions={feedbackDimensions}
         />
       </div>
 

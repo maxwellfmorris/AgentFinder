@@ -292,7 +292,64 @@ If codes ran out but approved reviews exist without a code (reviewer never got o
 
 ---
 
-## 10. Full test cycle (dev / staging)
+## 10. Managing feedback dimensions
+
+### View all active dimensions
+
+```sql
+select id, agent_id, label, description, sort_order, active
+from feedback_dimensions
+order by agent_id nulls first, sort_order;
+```
+
+Core dimensions have `agent_id = null` and apply to every Workshop agent automatically. Custom dimensions have an `agent_id` set and only appear on that agent's review form.
+
+### Add a custom dimension for a specific agent
+
+```sql
+insert into feedback_dimensions (agent_id, label, description, sort_order)
+values (
+  (select id from agents where slug = '<SLUG>'),
+  'Accuracy',                                      -- label shown to reviewer
+  'How accurate and reliable are the results?',    -- optional tooltip
+  10                                               -- sort after core dims (1–5)
+);
+```
+
+### Deactivate a dimension (hide without deleting)
+
+```sql
+update feedback_dimensions
+set active = false
+where label = '<LABEL>'
+  and agent_id = (select id from agents where slug = '<SLUG>');
+```
+
+To deactivate a core dimension globally:
+
+```sql
+update feedback_dimensions
+set active = false
+where label = '<LABEL>' and agent_id is null;
+```
+
+### View feedback responses for an agent
+
+```sql
+select
+  fd.label                        as dimension,
+  round(avg(fr.rating), 2)        as avg_rating,
+  count(*)                        as response_count
+from feedback_responses fr
+join feedback_dimensions fd on fd.id = fr.dimension_id
+where fr.agent_id = (select id from agents where slug = '<SLUG>')
+group by fd.label
+order by fd.label;
+```
+
+---
+
+## 11. Full test cycle (dev / staging)
 
 Use this to verify the end-to-end flow on any agent without leaving real data behind.
 

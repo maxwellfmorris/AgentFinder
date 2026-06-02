@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase'
-import type { Agent, AgentEval, AgentTask, FeaturedTier, PricingModel, TrustTier, UsageClaim } from '@/types/database'
+import type { Agent, AgentEval, AgentTask, FeaturedTier, FeedbackDimension, PricingModel, TrustTier, UsageClaim } from '@/types/database'
 import { isVerifiedUsage } from '@/types/database'
 
 export const PLACEHOLDER_AGENTS: Agent[] = [
@@ -527,6 +527,28 @@ export async function getSimilarAgents(
     return PLACEHOLDER_AGENTS
       .filter((a) => a.category === category && a.slug !== currentSlug)
       .slice(0, limit)
+  }
+}
+
+// Fetch feedback dimensions for a given agent slug.
+// Returns core dimensions (agent_id IS NULL) plus any custom dimensions
+// added for this specific agent, ordered by sort_order.
+export async function getFeedbackDimensions(agentId: string): Promise<FeedbackDimension[]> {
+  const supabase = getSupabaseClient()
+  if (!supabase) return []
+
+  try {
+    const { data, error } = await supabase
+      .from('feedback_dimensions')
+      .select('*')
+      .or(`agent_id.is.null,agent_id.eq.${agentId}`)
+      .eq('active', true)
+      .order('sort_order', { ascending: true })
+
+    if (error || !data) return []
+    return data as FeedbackDimension[]
+  } catch {
+    return []
   }
 }
 

@@ -3,14 +3,21 @@
 import { useState } from 'react'
 import { ReviewForm } from './ReviewForm'
 import { ReviewsList } from './ReviewsList'
+import type { FeedbackDimension } from '@/types/database'
 
 interface ReviewsSectionProps {
   agentId: string
   workshopActive?: boolean
   creditType?: string | null
+  feedbackDimensions?: FeedbackDimension[]
 }
 
-export function ReviewsSection({ agentId, workshopActive = false, creditType = null }: ReviewsSectionProps) {
+export function ReviewsSection({
+  agentId,
+  workshopActive = false,
+  creditType = null,
+  feedbackDimensions = [],
+}: ReviewsSectionProps) {
   const [refreshKey, setRefreshKey] = useState(0)
 
   return (
@@ -21,6 +28,7 @@ export function ReviewsSection({ agentId, workshopActive = false, creditType = n
           agentId={agentId}
           workshopActive={workshopActive}
           creditType={creditType}
+          feedbackDimensions={feedbackDimensions}
           onReviewSubmitted={() => setRefreshKey((k) => k + 1)}
         />
         <ReviewsList agentId={agentId} refreshKey={refreshKey} />

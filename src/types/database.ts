@@ -43,6 +43,27 @@ export interface Agent {
   workshop_paused: boolean
 }
 
+export interface FeedbackDimension {
+  id: string
+  created_at: string
+  agent_id: string | null   // null = core dimension (applies to all Workshop agents)
+  label: string
+  description: string | null
+  sort_order: number
+  active: boolean
+}
+
+export interface FeedbackResponse {
+  id: string
+  created_at: string
+  review_id: string
+  agent_id: string
+  user_id: string
+  dimension_id: string
+  rating: number            // 1–5
+  comment: string | null
+}
+
 export interface WorkshopCreditCode {
   id: string
   created_at: string
@@ -214,6 +235,18 @@ export type Database = {
         Row: WorkshopCreditCode & Record<string, unknown>
         Insert: Omit<WorkshopCreditCode, 'id' | 'created_at'> & Record<string, unknown>
         Update: Partial<Omit<WorkshopCreditCode, 'id' | 'created_at'>> & Record<string, unknown>
+        Relationships: []
+      }
+      feedback_dimensions: {
+        Row: FeedbackDimension & Record<string, unknown>
+        Insert: Omit<FeedbackDimension, 'id' | 'created_at'> & Record<string, unknown>
+        Update: Partial<Omit<FeedbackDimension, 'id' | 'created_at'>> & Record<string, unknown>
+        Relationships: []
+      }
+      feedback_responses: {
+        Row: FeedbackResponse & Record<string, unknown>
+        Insert: Omit<FeedbackResponse, 'id' | 'created_at'> & Record<string, unknown>
+        Update: Partial<Omit<FeedbackResponse, 'id' | 'created_at'>> & Record<string, unknown>
         Relationships: []
       }
     }

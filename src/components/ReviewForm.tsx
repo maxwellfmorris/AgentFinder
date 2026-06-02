@@ -5,13 +5,20 @@ import { Star, Loader2, Sparkles } from 'lucide-react'
 import { useAuth } from './AuthProvider'
 import { SignInModal } from './SignInModal'
 import { getSupabaseBrowser } from '@/lib/supabase-browser'
-import type { UsageClaim } from '@/types/database'
+import type { FeedbackDimension, UsageClaim } from '@/types/database'
 import { USAGE_CLAIM_LABELS, isVerifiedUsage } from '@/types/database'
+
+interface DimensionResponse {
+  dimensionId: string
+  rating: number
+  comment: string
+}
 
 interface ReviewFormProps {
   agentId: string
   workshopActive?: boolean
   creditType?: string | null
+  feedbackDimensions?: FeedbackDimension[]
   onReviewSubmitted: () => void
 }
 
@@ -21,6 +28,7 @@ export function ReviewForm({
   agentId,
   workshopActive = false,
   creditType = null,
+  feedbackDimensions = [],
   onReviewSubmitted,
 }: ReviewFormProps) {
   const { user } = useAuth()
@@ -32,6 +40,12 @@ export function ReviewForm({
   const [body, setBody] = useState('')
   const [usageProof, setUsageProof] = useState('')
   const [usageProofUrl, setUsageProofUrl] = useState('')
+  const [dimensionResponses, setDimensionResponses] = useState<Record<string, DimensionResponse>>(
+    () => Object.fromEntries(
+      feedbackDimensions.map((d) => [d.id, { dimensionId: d.id, rating: 0, comment: '' }])
+    )
+  )
+  const [hoveredDimension, setHoveredDimension] = useState<Record<string, number>>({})
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const supabase = getSupabaseBrowser()
@@ -116,7 +130,10 @@ export function ReviewForm({
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.from('reviews') as any).insert(payload)
+    const { data: reviewData, error } = await (supabase.from('reviews') as any)
+      .insert(payload)
+      .select('id')
+      .single()
 
     if (error) {
       if (error.code === '23505') {
@@ -125,10 +142,29 @@ export function ReviewForm({
         setErrorMsg('Something went wrong. Please try again.')
       }
       setStatus('error')
-    } else {
-      setStatus('success')
-      onReviewSubmitted()
+      return
     }
+
+    // Insert feedback dimension responses (only rated dimensions, rating > 0)
+    const responsesToInsert = Object.values(dimensionResponses)
+      .filter((r) => r.rating > 0)
+      .map((r) => ({
+        review_id: (reviewData as { id: string }).id,
+        agent_id: agentId,
+        user_id: user!.id,
+        dimension_id: r.dimensionId,
+        rating: r.rating,
+        comment: r.comment.trim() || null,
+      }))
+
+    if (responsesToInsert.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from('feedback_responses') as any).insert(responsesToInsert)
+      // Non-fatal: if this insert fails the review is still submitted
+    }
+
+    setStatus('success')
+    onReviewSubmitted()
   }
 
   return (
@@ -249,6 +285,75 @@ export function ReviewForm({
             />
           </div>
         </>
+      )}
+
+      {/* Feedback dimensions — shown for all Workshop submissions when dimensions exist */}
+      {workshopActive && feedbackDimensions.length > 0 && (
+        <div className="space-y-4 pt-2 border-t border-grape/10">
+          <p className="text-sm font-medium text-ink">
+            Rate specific areas <span className="text-muted/70 font-normal">(optional — helps the developer improve)</span>
+          </p>
+          {feedbackDimensions.map((dim) => {
+            const resp = dimensionResponses[dim.id] ?? { dimensionId: dim.id, rating: 0, comment: '' }
+            const dimHovered = hoveredDimension[dim.id] ?? 0
+            return (
+              <div key={dim.id} className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-sm font-medium text-ink">{dim.label}</span>
+                    {dim.description && (
+                      <span className="text-xs text-muted ml-2">{dim.description}</span>
+                    )}
+                  </div>
+                  <div className="flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() =>
+                          setDimensionResponses((prev) => ({
+                            ...prev,
+                            [dim.id]: { ...resp, rating: n },
+                          }))
+                        }
+                        onMouseEnter={() =>
+                          setHoveredDimension((prev) => ({ ...prev, [dim.id]: n }))
+                        }
+                        onMouseLeave={() =>
+                          setHoveredDimension((prev) => ({ ...prev, [dim.id]: 0 }))
+                        }
+                        className="p-0.5"
+                      >
+                        <Star
+                          size={18}
+                          className={
+                            n <= (dimHovered || resp.rating)
+                              ? 'text-amber-400 fill-amber-400'
+                              : 'text-slate-200 fill-slate-200'
+                          }
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {resp.rating > 0 && (
+                  <input
+                    type="text"
+                    value={resp.comment}
+                    onChange={(e) =>
+                      setDimensionResponses((prev) => ({
+                        ...prev,
+                        [dim.id]: { ...resp, comment: e.target.value },
+                      }))
+                    }
+                    placeholder={`Any specific feedback on ${dim.label.toLowerCase()}? (optional)`}
+                    className="w-full px-3 py-2 bg-cream border border-grape/15 rounded-lg text-sm text-ink placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-grape focus:border-transparent"
+                  />
+                )}
+              </div>
+            )
+          })}
+        </div>
       )}
 
       {errorMsg && (
