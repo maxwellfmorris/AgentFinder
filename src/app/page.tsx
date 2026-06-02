@@ -3,6 +3,7 @@ import { ArrowRight, CheckCircle, Star, Zap, Shield } from 'lucide-react'
 import { getAgents, getFeaturedAgents } from '@/lib/agents'
 import { AgentCard } from '@/components/AgentCard'
 import { HomeSearch } from '@/components/HomeSearch'
+import { WaitlistStrip } from '@/components/WaitlistStrip'
 import { isFeatured } from '@/types/database'
 import type { Agent } from '@/types/database'
 
@@ -153,6 +154,9 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Waitlist */}
+      <WaitlistStrip />
 
       {/* Trust strip */}
       <section className="bg-ink text-white rounded-t-[44px]">
