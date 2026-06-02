@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { getSupabaseServer } from '@/lib/supabase-server'
-import { getReviewStatsForAgent, getLatestEvalsForAgent, getReviewCountSparkline } from '@/lib/agents'
+import { getReviewStatsForAgent, getLatestEvalsForAgent, getReviewCountSparkline, getOutboundClickCount } from '@/lib/agents'
 import type { Agent } from '@/types/database'
 import { DashboardCard } from '@/components/DashboardCard'
 import { DashboardSignInGate } from '@/components/DashboardSignInGate'
@@ -29,12 +29,13 @@ export default async function DashboardPage() {
 
   const cardData = await Promise.all(
     agents.map(async (agent) => {
-      const [stats, evals, sparkline] = await Promise.all([
+      const [stats, evals, sparkline, clicks] = await Promise.all([
         getReviewStatsForAgent(agent.id),
         getLatestEvalsForAgent(agent.id),
         getReviewCountSparkline(agent.id),
+        getOutboundClickCount(agent.id),
       ])
-      return { agent, stats, evals, sparkline }
+      return { agent, stats, evals, sparkline, clicks }
     })
   )
 
@@ -54,7 +55,7 @@ export default async function DashboardPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          {cardData.map(({ agent, stats, evals, sparkline }) => (
+          {cardData.map(({ agent, stats, evals, sparkline, clicks }) => (
             <div key={agent.id}>
               <div className="mb-2">
                 {agent.status === 'published' ? (
@@ -76,6 +77,7 @@ export default async function DashboardPage() {
                 stats={stats}
                 evals={evals}
                 sparkline={sparkline}
+                clicks={clicks}
               />
             </div>
           ))}

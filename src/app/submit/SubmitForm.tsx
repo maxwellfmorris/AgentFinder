@@ -290,6 +290,26 @@ export function SubmitForm() {
         </Field>
       </Section>
 
+      {/* Monetization */}
+      <Section title="Monetization">
+        <Field
+          label="Affiliate / tracking URL"
+          hint="If you run an affiliate or referral program, paste your tracked link here. AgentFinder will route 'Visit Website' clicks through this URL and show you click counts on your dashboard. Leave blank to use your standard website URL."
+        >
+          <div className="flex">
+            <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-grape/15 bg-grape/5 text-muted text-sm">
+              https://
+            </span>
+            <input
+              name="affiliate_url"
+              type="text"
+              placeholder="yourproduct.com?ref=agentfinder"
+              className="flex-1 px-4 py-2.5 bg-cream border border-grape/15 rounded-r-xl text-sm text-ink placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-grape focus:border-transparent"
+            />
+          </div>
+        </Field>
+      </Section>
+
       {status === 'error' && (
         <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
           {errorMsg}

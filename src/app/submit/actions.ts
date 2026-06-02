@@ -208,6 +208,10 @@ export async function submitAgent(formData: FormData): Promise<SubmitResult> {
     .split(',')
     .map((t) => t.trim())
     .filter(Boolean)
+  const affiliateRaw = (formData.get('affiliate_url') as string)?.trim()
+  const affiliate_url = affiliateRaw
+    ? `https://${affiliateRaw.replace(/^https?:\/\//i, '')}`
+    : null
 
   if (!name || !tagline || !description || !category || !pricing_model || !setup_complexity) {
     return { success: false, error: 'Please fill in all required fields.' }
@@ -238,6 +242,7 @@ export async function submitAgent(formData: FormData): Promise<SubmitResult> {
     average_rating: null,
     review_count: 0,
     submitted_by_user_id,
+    affiliate_url,
   })
 
   if (error) {

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { AlertTriangle, Loader2 } from 'lucide-react'
 import type { Agent, AgentEval } from '@/types/database'
 import { getLetterGrade, GRADE_COLORS, isFeatured } from '@/types/database'
-import type { ReviewStats } from '@/lib/agents'
+import type { ReviewStats, OutboundClickStats } from '@/lib/agents'
 import { TierChip } from './TierChip'
 import { HowToClimbModal } from './HowToClimbModal'
 import { purchaseFeature } from '@/app/dashboard/feature-actions'
@@ -16,6 +16,7 @@ interface DashboardCardProps {
   stats: ReviewStats
   evals: AgentEval[]
   sparkline: number[]
+  clicks: OutboundClickStats
 }
 
 function Sparkline({ data }: { data: number[] }) {
@@ -99,7 +100,7 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-export function DashboardCard({ agent, stats, evals, sparkline }: DashboardCardProps) {
+export function DashboardCard({ agent, stats, evals, sparkline, clicks }: DashboardCardProps) {
   const router = useRouter()
   const [showClimb, setShowClimb] = useState(false)
   const [promoting, setPromoting] = useState(false)
@@ -160,7 +161,7 @@ export function DashboardCard({ agent, stats, evals, sparkline }: DashboardCardP
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-4 gap-4 mb-4">
         <div>
           <p className="text-2xl font-bold text-ink">{agent.review_count}</p>
           <p className="text-xs text-muted/70 mt-0.5">reviews</p>
@@ -191,6 +192,20 @@ export function DashboardCard({ agent, stats, evals, sparkline }: DashboardCardP
             </div>
           )}
           <p className="text-xs text-muted/70 mt-0.5">latest evals</p>
+        </div>
+        <div>
+          <p className="text-2xl font-bold text-ink">{clicks.total}</p>
+          <p className="text-xs text-muted/70 mt-0.5">
+            outbound clicks
+            {agent.affiliate_url && clicks.total > 0 && (
+              <span className="block text-grape">
+                {clicks.affiliate} affiliate · {clicks.direct} direct
+              </span>
+            )}
+            {agent.affiliate_url && clicks.total === 0 && (
+              <span className="block text-muted/50">affiliate link set</span>
+            )}
+          </p>
         </div>
       </div>
 

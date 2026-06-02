@@ -530,6 +530,33 @@ export async function getSimilarAgents(
   }
 }
 
+export interface OutboundClickStats {
+  total: number
+  affiliate: number
+  direct: number
+}
+
+export async function getOutboundClickCount(agentId: string): Promise<OutboundClickStats> {
+  const empty: OutboundClickStats = { total: 0, affiliate: 0, direct: 0 }
+  const supabase = getSupabaseClient()
+  if (!supabase) return empty
+
+  try {
+    const { data, error } = await supabase
+      .from('outbound_clicks')
+      .select('was_affiliate')
+      .eq('agent_id', agentId)
+
+    if (error || !data) return empty
+
+    const rows = data as { was_affiliate: boolean }[]
+    const affiliate = rows.filter((r) => r.was_affiliate).length
+    return { total: rows.length, affiliate, direct: rows.length - affiliate }
+  } catch {
+    return empty
+  }
+}
+
 // Fetch feedback dimensions for a given agent slug.
 // Returns core dimensions (agent_id IS NULL) plus any custom dimensions
 // added for this specific agent, ordered by sort_order.
