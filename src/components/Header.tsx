@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Search, Bot } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { NavAuthLinks } from './NavAuthLinks'
 
 export function Header() {
@@ -8,9 +8,17 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2 font-display font-bold text-xl text-ink">
-            <div className="bg-gradient-to-br from-coral to-grape text-white rounded-lg p-1.5">
-              <Bot size={18} />
-            </div>
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="logo-grad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#FF6B4A"/>
+                  <stop offset="50%" stopColor="#FF3D77"/>
+                  <stop offset="100%" stopColor="#8B2FE6"/>
+                </linearGradient>
+              </defs>
+              <rect width="32" height="32" rx="7" fill="url(#logo-grad)"/>
+              <text x="16" y="23" textAnchor="middle" fontFamily="'Space Grotesk', system-ui, sans-serif" fontWeight="700" fontSize="18" fill="white">b.</text>
+            </svg>
             bindie.ai
           </Link>
 
