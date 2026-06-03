@@ -241,6 +241,7 @@ export function SubmitForm() {
             {CATEGORIES.map((cat) => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
+            <option value="Other">Other</option>
           </select>
         </Field>
 
