@@ -20,21 +20,21 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: {
-    default: 'AgentFinder — Find AI Agents That Fit Your Life',
-    template: '%s | AgentFinder',
+    default: 'Bindie — Find AI That Fits Your Life',
+    template: '%s | Bindie',
   },
   description:
     'Discover and compare AI agents for everyday life — writing, money, learning, home, health, and travel. Real reviews and honest listings to help you find the right fit.',
   openGraph: {
-    siteName: 'AgentFinder',
+    siteName: 'Bindie',
     type: 'website',
-    title: 'AgentFinder — Find AI Agents That Fit Your Life',
+    title: 'Bindie — Find AI That Fits Your Life',
     description:
       'Discover and compare AI agents for everyday life — writing, money, learning, home, health, and travel. Real reviews and honest listings to help you find the right fit.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AgentFinder — Find AI Agents That Fit Your Life',
+    title: 'Bindie — Find AI That Fits Your Life',
     description:
       'Discover and compare AI agents for everyday life — writing, money, learning, home, health, and travel. Real reviews and honest listings to help you find the right fit.',
   },
@@ -53,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main>{children}</main>
           <footer className="border-t border-grape/10 bg-white mt-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted">
-              <span className="font-display font-semibold text-ink">AgentFinder</span>
+              <span className="font-display font-semibold text-ink">Bindie</span>
               <div className="flex items-center gap-5">
                 <Link href="/feedback" className="hover:text-grape transition-colors">
                   Send feedback
@@ -61,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/disclosure" className="hover:text-grape transition-colors">
                   Affiliate disclosure
                 </Link>
-                <span>© 2026 AgentFinder · Find AI agents that fit your life.</span>
+                <span>© 2026 Bindie · Find AI that fits your life.</span>
               </div>
             </div>
           </footer>

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description:
     'Find an AI agent that fits your life. Filter by what you want to do, what it costs, and the tools it works with — honest listings with real reviews.',
   openGraph: {
-    title: 'Browse AI Agents — AgentFinder',
+    title: 'Browse AI Agents — Bindie',
     description:
       'Find an AI agent that fits your life. Filter by what you want to do, what it costs, and the tools it works with.',
   },
@@ -157,7 +157,7 @@ export default async function AgentsPage({ searchParams }: PageProps) {
               Building an AI agent?
             </h2>
             <p className="text-muted text-sm">
-              List yours on AgentFinder — free to submit, reviewed within a few days.
+              List yours on Bindie — free to submit, reviewed within a few days.
             </p>
           </div>
           <Link

@@ -83,7 +83,7 @@ export async function prefillFromUrl(url: string): Promise<PrefillResult> {
     response = await fetch(parsed.toString(), {
       signal: controller.signal,
       headers: {
-        'User-Agent': 'AgentFinder-Crawler/1.0 (+https://agentfinder.com)',
+        'User-Agent': 'Bindie-Crawler/1.0 (+https://bindie.ai)',
         'Accept': 'text/html',
       },
     })

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getAgents } from '@/lib/agents'
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://agentfinder.com'
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://bindie.ai'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const agents = await getAgents()

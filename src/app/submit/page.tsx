@@ -2,8 +2,8 @@ import { SubmitForm } from './SubmitForm'
 import { Bot } from 'lucide-react'
 
 export const metadata = {
-  title: 'Submit an Agent — AgentFinder',
-  description: 'List your AI agent on AgentFinder and reach people looking for tools that fit their everyday life.',
+  title: 'Submit an Agent — Bindie',
+  description: 'List your AI agent on Bindie and reach people looking for tools that fit their everyday life.',
 }
 
 export default function SubmitPage() {

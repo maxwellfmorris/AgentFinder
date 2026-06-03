@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PageProps) {
   const agent = await getAgentBySlug(params.slug)
   if (!agent) return {}
 
-  const title = `${agent.name} Review — ${agent.tagline} | AgentFinder`
+  const title = `${agent.name} Review — ${agent.tagline} | Bindie`
   const description = agent.description.slice(0, 155) + '…'
 
   return {
@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: PageProps) {
       title,
       description,
       type: 'website',
-      siteName: 'AgentFinder',
+      siteName: 'Bindie',
     },
     twitter: {
       card: 'summary',
@@ -108,7 +108,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
     }
   }
 
-  const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://agentfinder.com'
+  const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://bindie.ai'
 
   const jsonLd = {
     '@context': 'https://schema.org',

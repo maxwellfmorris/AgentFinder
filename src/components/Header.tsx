@@ -11,7 +11,7 @@ export function Header() {
             <div className="bg-gradient-to-br from-coral to-grape text-white rounded-lg p-1.5">
               <Bot size={18} />
             </div>
-            AgentFinder
+            Bindie
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted">

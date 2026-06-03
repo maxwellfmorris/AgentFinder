@@ -4,7 +4,7 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Affiliate Disclosure',
   description:
-    'How AgentFinder earns affiliate commissions, what those links look like, and why they never affect rankings or trust tiers.',
+    'How Bindie earns affiliate commissions, what those links look like, and why they never affect rankings or trust tiers.',
 }
 
 export default function DisclosurePage() {
@@ -14,7 +14,7 @@ export default function DisclosurePage() {
         Affiliate disclosure
       </h1>
       <p className="text-muted mb-10">
-        How AgentFinder earns money — and what it means for what you read here.
+        How Bindie earns money — and what it means for what you read here.
       </p>
 
       <div className="space-y-6 text-ink/80 leading-relaxed">
@@ -23,7 +23,7 @@ export default function DisclosurePage() {
             The short version
           </h2>
           <p>
-            Some &ldquo;Visit Website&rdquo; links on AgentFinder are affiliate links.
+            Some &ldquo;Visit Website&rdquo; links on Bindie are affiliate links.
             When you click one and sign up for the product, the product&apos;s company may
             pay us a small commission. <strong>You pay the same price either way.</strong>{' '}
             That&apos;s how we keep the site free and ad-free.

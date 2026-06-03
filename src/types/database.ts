@@ -144,7 +144,7 @@ export interface AgentEval {
 
 export const VERIFIED_BY_LABELS: Record<VerifiedBy, string> = {
   self_reported: 'Self-reported',
-  agentfinder: 'AgentFinder verified',
+  agentfinder: 'Bindie verified',
   third_party: 'Third-party',
 }
 
