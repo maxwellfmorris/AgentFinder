@@ -38,11 +38,6 @@ export const metadata: Metadata = {
     description:
       'Discover and compare AI agents for everyday life — writing, money, learning, home, health, and travel. Real reviews and honest listings to help you find the right fit.',
   },
-  icons: {
-    icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
-  },
   robots: {
     index: true,
     follow: true,
