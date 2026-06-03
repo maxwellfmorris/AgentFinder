@@ -1,4 +1,4 @@
-# AgentFinder — Context for a Fresh Claude Session
+# bindie.ai — Context for a Fresh Claude Session
 
 Save this file at the repo root. Paste its contents (or point Claude at it) at the start of any new chat to skip rediscovering the project.
 
@@ -6,14 +6,28 @@ Save this file at the repo root. Paste its contents (or point Claude at it) at t
 
 ## What this is
 
-**AgentFinder** is a consumer-facing directory of AI agents for everyday life. Buyers come to find AI tools that help with writing, learning, money, home, health, hobbies, and travel — not work. The platform makes money via **subscription affiliate**: AgentFinder earns commission when buyers subscribe to a listed agent through an outbound link. Editorial independence is a load-bearing trust claim and is explicitly disclosed on the homepage.
+**bindie.ai** is a consumer-facing directory of AI tools for everyday life. Users come to find AI tools that help with writing, learning, money, home, health, hobbies, and travel — not work. The platform makes money via **subscription affiliate**: bindie.ai earns commission when users click through to a listed agent and subscribe. Editorial independence is a load-bearing trust claim and is explicitly disclosed on the site.
+
+**Brand:** All lowercase. The brand name is "bindie.ai" — not "Bindie", not "BindieAI". The .ai is part of the identity. Display it as `bindie.ai` everywhere: header, footer, page titles, body copy.
 
 **Target audience:** AI-curious individuals in their late 20s and up, using AI for personal life things outside of work. Mid-career-ish, tried ChatGPT, comfortable with technology but not developers, allergic to enterprise sales motions, attentive to honest peer-shaped reviews.
 
-**Strategic anchors (from the original conversation that shaped the build):**
+**Strategic anchors:**
 - Modeled loosely after Wirecutter's editorial-affiliate trust pattern, *not* Angi/Thumbtack's pay-per-lead marketplace model.
 - Pay-per-lead is explicitly avoided by design — featured listings are flat-fee + time-boxed only.
 - AI agents are *task-shaped products* (the buyer's mental sentence is "I want a tool that can [verb]"), unlike services where the category *is* the job. So the discovery flow is task-driven (search box first), with category browse as a secondary lane.
+- **Free model:** bindie.ai is free for users and free for developers to list on. Monetization is affiliate commissions + paid featured placements. No Stripe, no Workshop fees, no developer subscription.
+
+---
+
+## Business context
+
+- **Legal entity:** LLC registered in Colorado with a FEIN. Operating as "bindie.ai" via DBA. Owner is moving to Massachusetts end of summer 2026 — LLC domestication or foreign registration decision deferred until then.
+- **Banking:** Mercury account (existing, from prior business).
+- **Domain:** bindie.ai — registered on Cloudflare Registrar (2-year, .ai TLD requires 2-year minimum).
+- **Email:** Google Workspace Starter ($6/mo) — maxwell@bindie.ai as primary. Pending DNS verification as of this writing. MX records to be added to Cloudflare once verified.
+- **Social:** X/Twitter account (@bindieai or @bindie_ai) — pending Gmail setup for account creation.
+- **Vercel project:** `agent-finder` under `maxwell-morris-projects` org. Auto-deploys on push to `main`. `NEXT_PUBLIC_SITE_URL` should be set to `https://bindie.ai` in Vercel dashboard.
 
 ---
 
@@ -27,17 +41,16 @@ Save this file at the repo root. Paste its contents (or point Claude at it) at t
   - `@supabase/ssr 0.10.2` for the cookie-aware server and browser clients
   - `@supabase/supabase-js 2.x` for the simple anon server client
 - **lucide-react** for icons
-- **Deployed on Vercel** (Hobby tier) — production auto-deploys on every push to `main` (GitHub repo `maxwellfmorris/AgentFinder`). Two env vars set in Vercel: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Supabase is the hosted cloud project; migrations are run in its SQL editor. Live on the default `*.vercel.app` URL — a custom domain is owned but intentionally not connected yet.
-- **No third-party** charting library, no third-party analytics SDK (PostHog, Mixpanel, Vercel Analytics, etc.). Everything telemetry-shaped lives in Supabase.
-- **No LLM dependencies** in the codebase. Lexical search uses Postgres FTS. LLM-classified search is on the roadmap but not built.
+- **Deployed on Vercel** (Hobby tier) — production auto-deploys on every push to `main`. bindie.ai custom domain live via Cloudflare DNS (two CNAME records pointing to Vercel, proxy disabled). Three env vars in Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL=https://bindie.ai`.
+- **No third-party** charting library, no third-party analytics SDK. Everything telemetry-shaped lives in Supabase.
+- **No LLM dependencies** in the codebase. Search uses Postgres FTS + pg_trgm fuzzy fallback.
 
 ### Runtime constraints
 
 - **Repo path:** `/Users/sheamccusker/Desktop/MFMs Junk/VibeCoders/AgentFinder/` — must not contain an apostrophe. Next.js's metadata-route webpack loader doesn't escape apostrophes when interpolating absolute paths into error-message string literals, which breaks `npm run build`. (The folder was renamed from `MFM's Junk` → `MFMs Junk` to fix this.)
 - **Dev server port:** usually `3000`. If a stale process is squatting, Next picks `3001`. Clean up with `lsof -ti:3000,3001 | xargs kill -9` from a separate terminal.
 - **Supabase CLI is not wired up.** All migrations are applied manually by the user pasting SQL into the Supabase dashboard's SQL editor.
-- **The user is a non-developer.** Recent work is done in Cowork: Claude edits the repo files directly and verifies with `npx tsc --noEmit` + `npx next lint` before handing off. The user then runs any SQL in the Supabase SQL editor and commits/pushes via their own terminal (push auto-deploys to Vercel). They prefer SQL pasted inline in chat, and clear labeling of which tool a command belongs in (Terminal vs Supabase) — conflating the two has caused errors.
-- **Sandbox git quirk:** when Claude runs git operations from its sandbox, write conflicts sometimes leave a stale `.git/index.lock` file behind. The user clears it with `rm -f .git/index.lock` from their own terminal before retrying the commit.
+- **The user is a non-developer.** Work is done in Cowork: Claude edits the repo files directly and verifies with `npx tsc --noEmit` before handing off. The user then runs any SQL in the Supabase SQL editor and commits/pushes via their own terminal (push auto-deploys to Vercel). They prefer SQL pasted inline in chat, and clear labeling of which tool a command belongs in (Terminal vs Supabase) — conflating the two has caused errors.
 
 ---
 
@@ -46,329 +59,289 @@ Save this file at the repo root. Paste its contents (or point Claude at it) at t
 ```
 src/
 ├── app/
-│   ├── page.tsx                       # Homepage — hero, search, categories, life-stage chips, featured, trust strip
-│   ├── layout.tsx                     # Root layout — wraps everything in AuthProvider + Header
-│   ├── sitemap.ts                     # SEO sitemap (per-agent URLs)
+│   ├── page.tsx                       # Homepage — hero, search, categories, life-stage chips, featured, waitlist strip, trust strip
+│   ├── layout.tsx                     # Root layout — wraps everything in AuthProvider + Header + footer
+│   ├── sitemap.ts                     # SEO sitemap (per-agent URLs), BASE_URL = https://bindie.ai
 │   ├── robots.ts                      # SEO robots.txt
 │   ├── agents/
-│   │   ├── page.tsx                   # Browse — filters, search, sponsored-featured row, results grid via SearchResultLink
-│   │   └── [slug]/page.tsx            # Agent detail — hero, Quick Tasks, About, At a Glance, Performance, Reviews, JSON-LD
+│   │   ├── page.tsx                   # Browse — filters, search, results grid
+│   │   └── [slug]/page.tsx            # Agent detail — hero, About, At a Glance, Workshop callout, feedback dimensions, Reviews, JSON-LD
 │   ├── submit/
 │   │   ├── page.tsx                   # /submit shell
-│   │   ├── SubmitForm.tsx             # Smart import + 12-field manual form, controlled state for prefillable fields
-│   │   └── actions.ts                 # submitAgent server action + prefillFromUrl server action (HTML scrape + SSRF defense)
+│   │   ├── SubmitForm.tsx             # Smart import + form. Includes Monetization section with optional affiliate_url field. Category includes "Other".
+│   │   └── actions.ts                 # submitAgent (includes affiliate_url) + prefillFromUrl server actions
 │   ├── dashboard/
-│   │   ├── page.tsx                   # /dashboard — async server component, gated by AuthProvider; shows per-listing status badge (pending/published)
-│   │   └── feature-actions.ts         # purchaseFeature server action (auth + ownership check, sets featured_until/featured_tier)
-│   └── feedback/
-│       ├── page.tsx                   # /feedback — beta feedback page (linked in footer)
-│       ├── FeedbackForm.tsx           # Client form: message + optional email; captures document.referrer as page_path
-│       └── actions.ts                 # submitFeedback server action → feedback table
+│   │   ├── page.tsx                   # /dashboard — per-listing status badge + outbound click counts
+│   │   └── feature-actions.ts         # purchaseFeature server action
+│   ├── waitlist/
+│   │   └── actions.ts                 # joinWaitlist server action → waitlist table
+│   ├── feedback/
+│   │   ├── page.tsx
+│   │   ├── FeedbackForm.tsx
+│   │   └── actions.ts
+│   └── disclosure/page.tsx            # /disclosure — FTC affiliate policy, all copy updated to bindie.ai
 ├── components/
-│   ├── Header.tsx                     # Server component, includes NavAuthLinks for auth-aware nav
-│   ├── NavAuthLinks.tsx               # Client island — renders the "Dashboard" link only when authed
-│   ├── AuthProvider.tsx               # Context provider for the current user
-│   ├── SignInModal.tsx                # Magic-link sign-in dialog
-│   ├── AgentCard.tsx                  # The card shown in every grid; accepts optional onView prop for click logging
-│   ├── TierChip.tsx                   # Colored chip showing trust_tier (Listed/Verified/Vetted/Audited)
-│   ├── EvalRow.tsx                    # One eval benchmark row with letter-grade chip
-│   ├── QuickTaskCard.tsx              # ORPHANED — old pre-priced task tile; no longer imported (Quick Tasks repurposed into "Good for"). Safe to delete.
-│   ├── ReviewForm.tsx                 # Review submission with usage_claim radio + months_used input
-│   ├── ReviewsList.tsx                # Reviews display with "Verified user · paying · N months" chip
-│   ├── ReviewsSection.tsx             # Wraps form + list with refresh-on-submit
-│   ├── HomeSearch.tsx                 # Task-driven search input on the homepage
-│   ├── SearchBar.tsx                  # The search box on /agents (separate from HomeSearch)
-│   ├── SearchResultLink.tsx           # Wraps AgentCard for click-event logging on search-result clicks
-│   ├── FilterSidebar.tsx              # Category / Pricing / For Who / Works With checkboxes (desktop sidebar + reused inside MobileFilters)
-│   ├── MobileFilters.tsx             # Mobile-only "Filters" button + slide-in drawer wrapping FilterSidebar (lg:hidden); shows active-count badge
-│   ├── DashboardCard.tsx              # Submitter-dashboard card: header, stats grid, sparkline, diagnostics
-│   ├── DashboardSignInGate.tsx        # Unauthenticated /dashboard view
-│   └── HowToClimbModal.tsx            # Modal listing all 4 trust tiers, current one highlighted
+│   ├── Header.tsx                     # Shows "bindie.ai" logo mark
+│   ├── NavAuthLinks.tsx               # Client island — auth-aware nav
+│   ├── AuthProvider.tsx               # Context provider for current user
+│   ├── SignInModal.tsx                # Magic-link sign-in
+│   ├── AgentCard.tsx                  # Card with Workshop pill, affiliate dot indicator
+│   ├── TierChip.tsx                   # listed/verified/vetted/audited
+│   ├── EvalRow.tsx                    # Benchmark row with letter-grade chip
+│   ├── QuickTaskCard.tsx              # ORPHANED — safe to delete
+│   ├── ReviewForm.tsx                 # Workshop-aware. Includes feedback dimensions section (star rating + optional comment per dimension) when workshopActive + dimensions present
+│   ├── ReviewsList.tsx                # Approved reviews with VerifiedChip + IncentivizedChip
+│   ├── ReviewsSection.tsx             # Wraps ReviewForm + ReviewsList, accepts feedbackDimensions prop
+│   ├── WaitlistStrip.tsx              # "Get notified when we launch" email capture strip on homepage
+│   ├── HomeSearch.tsx                 # Task-driven search on homepage
+│   ├── SearchBar.tsx                  # Search box on /agents
+│   ├── SearchResultLink.tsx           # Wraps AgentCard for click logging
+│   ├── FilterSidebar.tsx              # Category/Pricing/For Who/Works With filters
+│   ├── MobileFilters.tsx              # Mobile filter drawer
+│   ├── OutboundLink.tsx               # Fires logOutboundClick on click
+│   ├── DashboardCard.tsx              # Stats grid now has 4 columns: reviews, verified avg, evals, outbound clicks
+│   ├── DashboardSignInGate.tsx
+│   └── HowToClimbModal.tsx
 ├── lib/
-│   ├── supabase.ts                    # Simple anon server client (no cookies); for reads that don't need auth
-│   ├── supabase-browser.ts            # createBrowserClient from @supabase/ssr; for client components
-│   ├── supabase-server.ts             # createServerClient with cookies(); for getUser() + authenticated actions
-│   ├── session.ts                     # getSessionId() — reads af_sid cookie set by middleware
-│   ├── events.ts                      # logSearchEvent + logClickEvent (fire-and-forget; both server actions)
-│   └── agents.ts                      # All data helpers + PLACEHOLDER_AGENTS dev fallback
+│   ├── supabase.ts                    # Simple anon server client
+│   ├── supabase-browser.ts            # createBrowserClient — client components
+│   ├── supabase-server.ts             # createServerClient w/ cookies() — server actions + auth
+│   ├── session.ts                     # getSessionId() — reads af_sid cookie
+│   ├── events.ts                      # logSearchEvent, logClickEvent, logOutboundClick
+│   └── agents.ts                      # All data helpers. Includes: getAgents, getAgentBySlug, getFeaturedAgents, getLatestEvalsForAgent, getReviewStatsForAgent, getReviewCountSparkline, getAgentsBySlugs, getSimilarAgents, getOutboundUrl, getOutboundClickCount, getFeedbackDimensions
 ├── types/
-│   └── database.ts                    # All shared types: Agent, Review, AgentEval, AgentTask, SearchEvent, enums + label maps + helpers
-└── middleware.ts                      # Sets httpOnly af_sid session cookie on every request that doesn't have one
+│   └── database.ts                    # All shared types including FeedbackDimension, FeedbackResponse, WorkshopCreditCode, OutboundClick + all enums + label maps
+└── middleware.ts                      # Sets httpOnly af_sid session cookie
 
 supabase/
-├── schema.sql                         # Canonical fresh-clone schema — kept in sync with migrations
-├── seed.sql                           # OLD fictional 14-agent catalog — stale; live catalog is the 18 real agents (migrations 0014 + 0016). Don't re-run on prod.
-├── seed_evals.sql                     # Sample evals for fictional agents — stale (those agents were deleted in 0015)
-├── seed_tasks.sql                     # Sample Quick Tasks for fictional agents — stale (those agents were deleted in 0015)
-└── migrations/                        # 19 numbered migrations, applied in order
-    ├── 0000_reviews_table.sql         # The reviews table (originally created in dashboard, captured here)
-    ├── 0001_review_rating_trigger.sql # Trigger that recomputes agents.average_rating/review_count on review change
-    ├── 0002_trust_tier.sql            # Replaces `verified bool` with `trust_tier` enum
-    ├── 0003_agent_evals.sql           # Eval scores table + RLS public-read
-    ├── 0004_review_usage.sql          # Adds usage_claim + months_used to reviews
-    ├── 0005_agent_owner.sql           # submitted_by_user_id FK to auth.users on delete set null
-    ├── 0006_featured.sql              # featured_until + featured_tier columns + partial index
-    ├── 0007_agent_tasks.sql           # Quick Tasks SKU table + RLS public-read
-    ├── 0008_search_events.sql         # Telemetry table for both 'search' and 'click' event types
-    ├── 0009_agents_search_vector.sql  # Generated tsvector column for Postgres FTS; drops the old functional index
-    ├── 0010_remap_categories.sql      # Best-effort remap of business categories to consumer categories
-    ├── 0011_consumer_catalog.sql      # Catalog migration: deletes 10 business agents, retags 8 dual-use, inserts 6 new
-    ├── 0012_feedback.sql              # Beta feedback table + public-insert RLS
-    ├── 0013_agent_status.sql          # Moderation gate: status column (pending/published/rejected); backfills existing → published
-    ├── 0014_real_agents_seed.sql      # Seeds 12 real consumer AI products (published, trust_tier listed, no ratings)
-    ├── 0015_remove_fictional_agents.sql # Deletes the 14 fictional example.com seed agents
-    ├── 0016_health_travel_agents.sql  # Adds 6 real agents to round out Health & Wellness (Ada Health, WHOOP, Headspace) + Travel (Hopper, GuideGeek, Wanderlog)
-    ├── 0017_agent_use_cases.sql        # Adds use_cases text[] column (default '{}'); seeds Grammarly's "Good for" list as the test case
-    └── 0018_use_cases_seed.sql         # Seeds "Good for" use_cases for the remaining 17 agents (slug-scoped UPDATEs)
+└── migrations/                        # 32 numbered migrations (0000–0031), applied in order in Supabase SQL editor
 ```
 
 ---
 
-## Data flow
+## Migration index
 
-### Database tables (Supabase Postgres)
+| # | File | What |
+|---|---|---|
+| 0000 | reviews_table | reviews table |
+| 0001 | review_rating_trigger | Trigger recomputing agents.average_rating/review_count |
+| 0002 | trust_tier | trust_tier enum |
+| 0003 | agent_evals | Evals table + public-read RLS |
+| 0004 | review_usage | usage_claim + months_used on reviews |
+| 0005 | agent_owner | submitted_by_user_id FK |
+| 0006 | featured | featured_until + featured_tier |
+| 0007 | agent_tasks | Quick Tasks SKU table (ORPHANED) |
+| 0008 | search_events | Telemetry table |
+| 0009 | agents_search_vector | Original generated tsvector (replaced in 0019) |
+| 0010 | remap_categories | B2B→consumer category remap |
+| 0011 | consumer_catalog | Catalog cleanup |
+| 0012 | feedback | Feedback table |
+| 0013 | agent_status | status enum (pending/published/rejected) |
+| 0014 | real_agents_seed | 12 real agents |
+| 0015 | remove_fictional_agents | Delete example.com agents |
+| 0016 | health_travel_agents | +6 agents |
+| 0017 | agent_use_cases | use_cases text[] |
+| 0018 | use_cases_seed | Seed use_cases for 17 agents |
+| 0019 | agent_search_upgrade | keywords text[], pg_trgm, trigger-maintained search_vector, search_agents RPC |
+| 0020 | search_stopwords | Stop-words filter in search_agents |
+| 0021 | search_coverage_ranking | Coverage-first ORDER BY |
+| 0022 | external_ratings | external_rating + source + url columns |
+| 0023 | external_ratings_seed | Seed 19 of 24 agents with ratings |
+| 0024 | agent_limitations | limitations text[] + seed all agents |
+| 0025 | catalog_growth_batch3 | +6 agents (ChatGPT, Claude.ai, Quizlet, Rocket Money, Canva, Runway) — catalog now 24 |
+| 0026 | affiliate_infrastructure | affiliate_url on agents; outbound_clicks table |
+| 0027 | workshop_foundation | 9 workshop_* columns on agents; reviews.incentivized; workshop_credit_codes table |
+| 0028 | workshop_review_approval | reviews.approved, usage_proof, usage_proof_url |
+| 0029 | feedback_dimensions | feedback_dimensions table — core + custom per-agent dimensions |
+| 0030 | feedback_responses | feedback_responses table — per-dimension ratings + comments |
+| 0031 | waitlist | waitlist table — email capture, public insert, no public read |
 
-- **agents** — the catalog. Public-read (the app's read helpers expose only `status='published'` rows), public-insert via /submit (new submissions land as `pending`). Key columns: `id`, `slug` (unique), `name`, `tagline`, `description`, `category` (text matching `CATEGORIES` enum in TS), `industry_tags` text[] (life-stage tags), `platform_integrations` text[], `pricing_model` enum, `setup_complexity` enum, `trust_tier` enum, `average_rating` numeric(3,2), `review_count` int, `submitted_by_user_id` uuid FK auth.users, `featured_until` timestamptz, `featured_tier` text, `status` text ('pending'|'published'|'rejected', default 'pending'; migration 0013), `search_vector` tsvector (generated column).
-- **reviews** — public-read, owner-write RLS. Columns include `agent_id`, `user_id`, `user_email`, `rating` (1-5), `body`, `usage_claim` ('paying'|'free_trial'|'evaluating'|'none'), `months_used`. Trigger recomputes `agents.average_rating` and `agents.review_count` on any change.
-- **agent_evals** — public-read RLS. Stores standardized benchmark scores per agent: `benchmark_name`, `score` (0-100), `sample_size`, `notes`, `verified_by` ('self_reported'|'agentfinder'|'third_party'). Letter grade is computed in TS via `getLetterGrade()`, NOT stored.
-- **agent_tasks** — public-read RLS. Quick Tasks SKUs: `title`, `description`, `price_usd`, `expected_duration_minutes`, `available` bool. Partial index on `(agent_id) where available = true`.
-- **search_events** — public-insert RLS, no select policy (reads happen via SQL editor). Both 'search' and 'click' event types in one wide-nullables table. Foreign-keyed to agents on delete cascade.
-- **feedback** — beta feedback. Public-insert RLS, no select policy (reads via SQL editor). Columns: `message`, `email` (nullable), `page_path` (nullable, captured from `document.referrer`), `session_id`, `user_id` (nullable FK auth.users on delete set null). Written by the `submitFeedback` server action from `/feedback`. Migration 0012.
+---
 
-### Three Supabase clients
+## Current catalog (24 real agents)
 
-The codebase has three different Supabase clients, each for a different purpose. Don't conflate them:
+All `trust_tier: listed`, `status: published`. Logos are DiceBear placeholders. External ratings seeded where publicly verifiable (19 of 24 — ChatGPT, Khanmigo, Midjourney, GuideGeek, Rocket Money intentionally NULL).
 
-1. **`lib/supabase.ts` → `getSupabaseClient()`** — the simple anon client. Used for reads that don't need to know who the user is. Returns null if env vars aren't set (dev-without-Supabase mode).
-2. **`lib/supabase-browser.ts` → `getSupabaseBrowser()`** — `createBrowserClient` from `@supabase/ssr`. Used inside client components for live auth state and writes-as-current-user.
-3. **`lib/supabase-server.ts` → `getSupabaseServer()`** — `createServerClient` from `@supabase/ssr` with `cookies()` from next/headers. Used in server actions and async server components when you need to read the current user (`auth.getUser()`) or write rows on behalf of an authenticated user.
+| Slug | Name | Category |
+|---|---|---|
+| grammarly | Grammarly | Writing & Communication |
+| wordtune | Wordtune | Writing & Communication |
+| hemingway-editor | Hemingway Editor | Writing & Communication |
+| jasper | Jasper | Writing & Communication |
+| khanmigo | Khanmigo | Learning & Skills |
+| duolingo | Duolingo | Learning & Skills |
+| quizlet | Quizlet | Learning & Skills |
+| cleo | Cleo | Money & Finances |
+| copilot-money | Copilot Money | Money & Finances |
+| rocket-money | Rocket Money | Money & Finances |
+| ohai-ai | Ohai.ai | Home & Family |
+| samsung-food | Samsung Food | Home & Family |
+| wysa | Wysa | Health & Wellness |
+| ada-health | Ada Health | Health & Wellness |
+| whoop | WHOOP | Health & Wellness |
+| headspace | Headspace | Health & Wellness |
+| midjourney | Midjourney | Hobbies & Creative |
+| suno | Suno | Hobbies & Creative |
+| canva | Canva | Hobbies & Creative |
+| runway | Runway | Hobbies & Creative |
+| mindtrip | Mindtrip | Travel & Planning |
+| hopper | Hopper | Travel & Planning |
+| guidegeek | GuideGeek | Travel & Planning |
+| wanderlog | Wanderlog | Travel & Planning |
 
-The cookie-set/setAll plumbing in `supabase-server.ts` includes an empty try/catch around the set call — that's the documented `@supabase/ssr` pattern. The error it swallows is the expected "cannot modify cookies in a read-only context" thrown when this client is invoked from a pure Server Component.
+Categories also include **"Other"** as a catch-all option on the submit form for agents that don't fit the 7 defined categories.
 
-### Telemetry flow
+---
 
-1. Middleware (`src/middleware.ts`) runs on every non-asset request. If there's no `af_sid` cookie, it generates a UUID and sets one (httpOnly, SameSite=Lax, 1-year maxAge).
-2. `lib/session.ts → getSessionId()` reads that cookie from `next/headers`. Returns `'unset'` as a fallback for the very-first-request edge case before middleware has had a chance to set it (rare; filter out `'unset'` rows in analytics).
-3. `lib/events.ts → logSearchEvent` is called from `/agents` server component when `searchParams.q` is present. Fire-and-forget, never awaited.
-4. `lib/events.ts → logClickEvent` is called from `SearchResultLink.tsx`'s `onClick` handler when a search result is clicked. Fire-and-forget. Only fires when `query` is non-null (i.e. only on search-driven clicks, never on category-only browsing).
-5. Both functions wrap their Supabase insert in try/catch and swallow errors silently — telemetry failures must never crash user flow.
+## Key features built
 
 ### Search
+Coverage-first ranking: (1) count of query tokens matching search_vector, (2) ts_rank, (3) word_similarity (pg_trgm, threshold 0.4), (4) name asc tiebreak. Stop-words filter strips common verbs/nouns before building the tsquery. OR-of-prefixes tsquery (e.g. `learn:* | italian:*`). `search_agents(q)` RPC declared in `Database['public']['Functions']`.
 
-- **Lexical search via Postgres FTS.** `agents.search_vector` is a generated tsvector column over `name || ' ' || tagline || ' ' || description` using the `english` config. Indexed with GIN.
-- `getAgents({ search: q })` in `lib/agents.ts` calls `.textSearch('search_vector', q, { type: 'plain', config: 'english' })`.
-- The dev fallback (`filterLocally`) uses a tokenize + naive plural-stripping heuristic to approximate the same behavior.
-- **Known stemmer blind spot:** Snowball stems "summarize" → `summar` and "summary" → `summari` — different stems. So `?q=summarize+meetings` returns no results even though MeetingMind has "summary" in its description. **This is accepted, not a bug.** The empty-result rows in `search_events` are the data point that will justify upgrading to LLM-classified search later.
+### Affiliate infrastructure
+`affiliate_url` on agents. When set, `getOutboundUrl()` returns it with `isAffiliate: true`. `OutboundLink` fires `logOutboundClick` on click. Grape dot on card external icons, italic disclosure note on detail/compare CTAs. `/disclosure` page in footer. `outbound_clicks` table tracks all clicks with `was_affiliate` bool.
 
-### Moderation gate (submission review)
+**Phase 3b (done):** `affiliate_url` field on submit form (Monetization section). `getOutboundClickCount()` in lib/agents.ts returns `{ total, affiliate, direct }`. Dashboard card shows outbound clicks as 4th stat, with affiliate/direct split when affiliate_url is set.
 
-Self-submitted agents do not auto-publish. `agents.status` is `'pending' | 'published' | 'rejected'`, defaulting to `pending` for new submissions (migration `0013`, which backfilled all pre-existing agents to `published`). The public read helpers in `lib/agents.ts` (`getAgents`, `getAgentBySlug`, `getFeaturedAgents`) all filter `.eq('status', 'published')`, so a pending agent never appears in browse, search, on detail pages, on the homepage, or in the sitemap. The owner dashboard query is intentionally NOT status-filtered — submitters see their own pending listings with a status badge. Approval is **manual**: flip `status` to `'published'` via SQL. The `/submit` success copy says the agent is "in the review queue," not live.
+**Phase 3c (owner's task):** Sign up for affiliate programs (Impact for Grammarly, Canva, Headspace etc.), paste tracked URLs into Supabase via `update agents set affiliate_url = '...' where slug = '...'`.
 
-### Feedback
+### Workshop program
+Developer opt-in program where indie AI developers offer credits (codes pool) in exchange for verified reviews. Free for developers.
 
-`/feedback` (linked in the footer) is a beta feedback channel. `FeedbackForm.tsx` (client) collects a message + optional email and captures `document.referrer` as `page_path`; the `submitFeedback` server action writes to the `feedback` table with the session id and (if signed in) user id. Same RLS-public-insert, swallow-errors pattern as telemetry. Read submissions via the Supabase SQL editor.
+**Schema:** 9 `workshop_*` columns on agents, `workshop_credit_codes` table, `reviews.incentivized` + `reviews.approved` + `reviews.usage_proof` + `reviews.usage_proof_url`.
 
-### Trust ladder
+**W1 (done):** Schema + visual signals (Workshop pill on cards, callout on detail page, IncentivizedChip on reviews).
 
-Defined in `src/types/database.ts`:
+**W2 (done):** Workshop-aware ReviewForm with usage_proof fields. Pending-state hold (approved=false). Three-state detail callout (offer/pending/earned). Founder approve+allocate workflow tested end-to-end.
 
-- **`listed`** — Submitted by the team. Information is self-reported.
-- **`verified`** — We've confirmed ownership and that the listing is accurate.
-- **`vetted`** — Verified, plus 10+ verified-user reviews and a published eval score.
-- **`audited`** — Vetted, plus an independent integration & security review in the last 12 months.
+**W3 (done):** `WORKSHOP_RUNBOOK.md` at repo root — SQL recipes for enable, upload codes, list pending, approve+allocate, reject, pause/resume, retire, inspect inventory, over-allocation recovery, feedback dimensions management, full test cycle.
 
-These strings are user-facing on the homepage trust strip, the agent detail page's "At a Glance" panel, and the "How to climb" modal. They are *deliberately falsifiable* — each rung is a climbable bar, not vague trust theater.
+**W4/W5 (shelved):** Payment infrastructure not needed — free model.
 
-Tier promotion is currently **manual** (set via SQL). The dashboard's "What's hurting you" diagnostics describe the path but don't auto-promote. Tier eligibility being independent of affiliate-partner status is a load-bearing claim — never wire those together.
+### Actionable feedback dimensions
+Structured per-dimension feedback collected alongside Workshop reviews.
 
-### Featured listings (paid placement)
+**Schema:** `feedback_dimensions` table (agent_id IS NULL = core, applies to all; agent_id NOT NULL = custom for that agent). 5 core dimensions seeded: Onboarding, Pricing Clarity, UI/UX, Support Quality, Value for Money. `feedback_responses` table stores rating (1–5) + optional comment per dimension per review.
 
-`featured_until` + `featured_tier` columns on agents. `featured_tier` is `'none' | 'category' | 'homepage'`. Hardcoded design rules:
+**UI:** When `workshopActive` and dimensions exist, ReviewForm renders a "Rate specific areas" section below the usage proof fields. Each dimension has a 5-star picker; rating > 0 reveals an optional comment input. Responses inserted after the review row.
 
-- **Flat-fee, time-boxed only.** No per-impression billing, no per-click tracking columns or code paths.
-- **Visually disclosed.** Every featured card on the homepage and on category-filtered `/agents` views renders a lowercase `sponsored` label (text-slate-400, 11px, no border, no decoration). The label string is exactly "sponsored" — never "Featured" or "Promoted", which obscure the paid nature.
-- **Independent of trust_tier.** Buying placement does not auto-climb tiers. A `listed` agent can buy homepage placement.
-- The `purchaseFeature` server action verifies the caller owns the agent (`submitted_by_user_id === auth.uid()`) before allowing the update.
+**Data flow:** `getFeedbackDimensions(agentId)` in lib/agents.ts → passed from detail page → ReviewsSection → ReviewForm.
 
-### Affiliate model (Phase 3 — not yet built)
+### Waitlist
+`waitlist` table (email, source, session_id, unique on email). `joinWaitlist` server action in `app/waitlist/actions.ts`. `WaitlistStrip` component on homepage between featured agents and trust strip — gradient grape/punch card, "Get notified when we launch" CTA, butter "Notify me" button, inline success state. Duplicate emails treated as silent success (no data leakage).
 
-Not implemented in code yet but the trust strip on the homepage already discloses it:
+---
 
-> "Reviews come from verified users — never paid, never editorialized. We earn a commission when you subscribe to an agent, but that never affects our rankings or trust tiers."
+## Go-to-market status
 
-Phase 3 will add an `affiliate_url` column on agents and update outbound CTAs to use it when present. Click-through attribution will extend the existing `search_events` table (or a sibling table).
+**Current goal:** Get one stranger (not personally known) onto the site. Everything else is secondary.
+
+**Done:**
+- bindie.ai domain live, custom domain wired to Vercel
+- Waitlist strip on homepage
+- Google Workspace account created (pending DNS verification)
+- Three outreach email templates written for: HumToBeats, Yogakosh, WhatCable (found on Product Hunt)
+
+**Pending Gmail verification:**
+- Create X account (@bindieai) with info@bindie.ai
+- Send three outreach emails
+- Sign up for Impact affiliate network (Grammarly, Canva, Headspace programs)
+
+**Outreach strategy:**
+- Target indie AI developers on Product Hunt (low upvote count = hungry for distribution)
+- Lead with free listing, no strings, personalized first line about their specific product
+- 10 emails/week, expect 2–3 replies
+- Post authentically on Reddit (r/artificial, r/ChatGPT, r/productivity) once ready to share publicly
+
+**Referral program:** Shelved. No paid tier = nothing to give away. Revisit after premium tier exists.
+
+**Product Hunt launch:** Prep when closer to launch. Requires maker profile, screenshots, tagline, warm upvotes.
+
+---
+
+## Data model highlights
+
+### agents table (key columns)
+`id`, `slug` (unique), `name`, `tagline`, `description`, `website`, `logo_url`, `category`, `industry_tags text[]`, `platform_integrations text[]`, `use_cases text[]`, `limitations text[]`, `keywords text[]`, `pricing_model`, `setup_complexity`, `trust_tier`, `status`, `average_rating`, `review_count`, `featured_until`, `featured_tier`, `external_rating`, `external_rating_count`, `external_rating_source`, `external_rating_url`, `affiliate_url`, `search_vector` (trigger-maintained tsvector), `workshop_active`, `workshop_credit_amount`, `workshop_credit_type`, `workshop_credit_redemption_url`, `workshop_credit_redemption_instructions`, `workshop_target_reviews`, `workshop_reviews_remaining`, `workshop_started_at`, `workshop_paused`
+
+### Three Supabase clients
+1. `lib/supabase.ts → getSupabaseClient()` — anon, no cookies. Public reads.
+2. `lib/supabase-browser.ts → getSupabaseBrowser()` — createBrowserClient. Client components.
+3. `lib/supabase-server.ts → getSupabaseServer()` — createServerClient w/ cookies(). Server actions + auth.getUser().
+
+### RLS overview
+| Table | Public read | Public insert |
+|---|---|---|
+| agents | where status='published' | ❌ |
+| reviews | ✓ | auth only |
+| feedback_dimensions | ✓ | ❌ (service role) |
+| feedback_responses | ✓ | auth only |
+| outbound_clicks | ✓ | ✓ |
+| workshop_credit_codes | auth (own claimed) | ❌ |
+| waitlist | ❌ | ✓ |
+| feedback | ❌ | ✓ |
+| search_events | ✓ | ✓ |
 
 ---
 
 ## Conventions and rules
 
 ### Migrations
-
-- Always wrap in `begin; ... commit;`.
-- Always idempotent: `create table if not exists`, `create index if not exists`, `add column if not exists`, `drop policy if exists` before `create policy`, `on conflict (slug) do nothing` on data inserts.
-- For type creation: `do $$ begin ... exception when duplicate_object then null; end $$;` guard.
-- `schema.sql` is kept in sync with migrations as the canonical fresh-clone artifact. Whenever a migration changes table shape, schema.sql is updated alongside.
-- Migrations applied manually via Supabase SQL editor. Paste contents into a "New query", click Run.
+- Always paste into Supabase SQL editor — never Terminal.
+- Wrap in `begin; ... commit;`.
+- Idempotent: `create table if not exists`, `add column if not exists`, `drop policy if exists` before `create policy`.
 
 ### TypeScript
+- No `any` casts in new code. Legacy `as any` on `supabase.from(...)` is pre-existing.
+- All new DB tables must be declared in `Database['public']['Tables']` in `types/database.ts`.
+- New DB functions must be declared in `Database['public']['Functions']`.
+- All new Agent fields must cascade to `PLACEHOLDER_AGENTS` in `lib/agents.ts` (5 entries).
 
-- **No `any` casts in new code.** The one pre-existing `// eslint-disable-next-line @typescript-eslint/no-explicit-any` on `supabase.from('...') as any` in `submitAgent` is legacy; don't propagate.
-- The `Database` type in `src/types/database.ts` uses `& Record<string, unknown>` widening on each table's `Row`/`Insert`/`Update`. This is intentional — it absorbs the friction between application types and the supabase-js generic constraints. Don't remove it.
-- The `Relationships: []` field on each `Database.Tables` entry is required by `@supabase/ssr`'s generics. Don't remove.
-
-### Components
-
-- Server components by default. Add `'use client'` only when you need state, hooks, or browser-only APIs.
-- The `Header` is a server component. Its auth-aware Dashboard link lives in `NavAuthLinks.tsx` — a small client island. This pattern (server shell + client island) is preferred over making whole components client.
-- `AgentCard` takes an optional `onView` prop that's attached to the "View Details" Link's `onClick`. The existing call sites that don't pass `onView` (homepage, sponsored row, dashboard) work unchanged.
-- The wrapper `SearchResultLink` exists to log clicks without nesting anchors. AgentCard already contains the View Details Link and an external website link — wrapping the whole card in another Link would produce doubly-nested anchors (invalid HTML).
-
-### Telemetry
-
-- Fire-and-forget. Never await `logSearchEvent` or `logClickEvent` in user flow.
-- `try/catch` swallows errors *inside* events.ts. Call sites still add a defensive `.catch(() => {})` as belt-and-suspenders.
-- The `session_id` is the cookie value, never PII.
-
-### Reviews
-
-- Reviews are user-generated. AgentFinder never editorializes them.
-- The "verified user" chip on reviews is computed from `usage_claim === 'paying' || 'free_trial'` via the `isVerifiedUsage()` helper in `types/database.ts`.
-- The agent detail page hero shows the **verified-user average as the primary number**, with the all-reviews average as a small footnote. This visual hierarchy is intentional and must not be reversed.
-
-### JSON-LD on agent detail pages
-
-- The detail page renders a minimal `SoftwareApplication` schema.org JSON-LD blob: `name`, `description`, `url`, `applicationCategory`, optional `aggregateRating` (using the all-reviews number), `offers`.
-- **DO NOT** add new fields to this blob. We've explicitly avoided adding `trust_tier`, eval scores, verified-user-subset reviews, Product schema for Quick Tasks, or affiliate-relationship fields. Self-asserted claims in structured data are dicey.
-
-### Affiliate / editorial independence
-
-- The trust strip on the homepage explicitly claims editorial independence ("We earn a commission when you subscribe to an agent, but that never affects our rankings or trust tiers"). This is a load-bearing trust claim with the late-20s+ AI-curious cohort.
-- Featured placement is the *only* disclosed paid lane. Everything outside featured slots must remain editorially independent of affiliate revenue.
-- Tier criteria do not reference affiliate-partnership status. A tier earned by an affiliate partner looks identical to one earned by a non-partner.
+### Deploy ordering (critical)
+1. Run SQL in Supabase dashboard first.
+2. Then `git add -A && git commit -m "..." && git push`.
+Never push code that reads new columns before the migration runs.
 
 ### Things explicitly never to do
-
-- Don't introduce a pay-per-lead, per-impression, or per-click billing mechanism for featured listings.
-- Don't add a third-party analytics SDK (PostHog, Mixpanel, Vercel Analytics, Amplitude, etc.). Telemetry stays in the `search_events` table.
-- Don't add a third-party HTML parsing or fetching library (cheerio, jsdom) to the smart-import flow. Native `fetch` + regex only.
-- Don't add a third-party charting/data-viz library. The dashboard sparkline is inline SVG by design.
-- Don't add an "anonymous mode" toggle to `/submit`. Ownership is automatic when the submitter is authenticated, absent when not.
-- Don't conflate `featured_tier` with `trust_tier`. They serve different purposes and must remain independent.
-- Don't dress up the "sponsored" label as "Featured" or "Promoted" anywhere it appears.
+- Don't add Stripe or any payment infrastructure (free model).
+- Don't add a third-party analytics SDK.
+- Don't add a third-party HTML parsing library (smart-import uses native fetch + regex).
+- Don't add a third-party charting library.
+- Don't fabricate ratings or reviews.
+- Don't conflate `featured_tier` with `trust_tier`.
+- Don't use `array_to_string(...)` in generated columns or expression indexes (STABLE, not IMMUTABLE — caused migration 0019 issue).
+- Don't dress up the "sponsored" label as "Featured" or "Promoted".
+- Don't change "bindie.ai" to title case anywhere in UI copy.
 
 ---
 
-## Current state
+## Known debt (non-blocking)
 
-### What's working end-to-end
+- `QuickTaskCard.tsx`, `getTasksForAgent` in lib/agents.ts, `agent_tasks` table (migration 0007), `seed_tasks.sql` — all orphaned after Good-for repurpose. Safe to delete in a cleanup pass.
+- `PLACEHOLDER_AGENTS` in lib/agents.ts still holds 5 fictional entries (Draftly, BudgetSense, MealMate, DayPulse, Journie). Dev-without-Supabase fallback only. Harmless.
+- `AuthProvider.tsx`, `ReviewsList.tsx`, `SignInModal.tsx` each have a single `react-hooks/exhaustive-deps` warning. Pre-existing, non-blocking.
+- `outbound_clicks` is public-read — exposes raw click data. Worth gating before public launch (aggregated views with per-agent filtering).
+- `NEXT_PUBLIC_SITE_URL` env var needs to be set to `https://bindie.ai` in Vercel dashboard if not done already.
 
-- **Trust ladder (P1)** — 4-tier system with falsifiable rung descriptions, surfaced on cards, detail pages, "How to climb" modal.
-- **Evals (P2)** — `agent_evals` table, Performance section on detail pages, letter-grade chips (A=emerald, B=green, C=amber, D=orange, F=red), seeded with sample evals on a few agents.
-- **Verified-usage reviews (P3)** — usage_claim radio in ReviewForm, "Verified user · paying · N months" chip in ReviewsList, dual-average display in the detail-page hero.
-- **Smart import (P4)** — paste-a-URL prefill on `/submit` via the `prefillFromUrl` server action. SSRF defense, 5s timeout, content-type check, HTML entity decoding, relative URL resolution, edit-clears-chip UX.
-- **Submitter dashboard (P5)** — `/dashboard` route, sign-in gate, per-agent cards with stats / sparkline / diagnostics / "Promote this listing" button / "How to climb" link.
-- **Featured listings (P6)** — flat-fee paid placement, `purchaseFeature` server action with ownership check, "sponsored" label on featured cards.
-- **Quick Tasks (P7)** — pre-priced atomic SKUs, rendered as a section inside the main agent card on detail pages. Outbound link with UTM tracking, no payment infrastructure yet.
-- **Search + telemetry (P8)** — task-driven HomeSearch on the homepage, Postgres FTS via tsvector, search-event and click-event logging via the cookie-based session.
-- **Consumer pivot (Phase 1 / 2a / 2b / 2c)** — voice, taxonomy, catalog, and life-stage UI all consumer-shaped.
-- **Live deployment (Week 1)** — deployed on Vercel, auto-deploying from `main`. Submit flow + RLS verified in production.
-- **Feedback path (Week 1)** — `/feedback` page, footer link, `feedback` table.
-- **Moderation gate (Week 2)** — `status` column; public reads gated to `published`; submissions land `pending`; dashboard shows per-listing status; submit copy reflects review.
-- **Real catalog (Week 2)** — 12 real, current consumer AI products seeded (`published`, `listed` tier, no fabricated ratings); all 14 fictional placeholders removed; homepage now pulls real published agents. Later expanded to **18** via migration 0016 (6 added to the two thinnest categories).
-- **Pivot cleanup (Week 2)** — site metadata refreshed to consumer voice; dead "Meetings"/"Analytics" header nav links repointed to live categories (Money, Learning).
-- **Mobile filtering** — Browse (`/agents`) filter sidebar is `hidden lg:block`; on mobile a `MobileFilters` "Filters" button + slide-in drawer (reusing `FilterSidebar`) exposes the full filter set. Resolves the old gap where phone users could only keyword-search.
-- **Mobile-tappable cards** — `AgentCard` uses a stretched-link overlay (`after:absolute after:inset-0` on the View Details link, external link lifted with `relative z-10`) so the whole tile navigates to the detail page. Scoped to mobile only via `lg:after:content-none` (desktop = button/link only).
-- **Mobile detail hero fix** — the detail-page hero stacks on mobile (`flex-col lg:flex-row`): logo + name/tagline group at full width, "Visit Website" drops below as a full-width button, padding eased to `p-6 sm:p-8`. Fixes the cramped one-word-per-line tagline + button-over-title overlap.
-- **"Good for" use-cases** — repurposed the old payment-oriented Quick Tasks into honest, free use-cases. Added `use_cases text[]` column to `agents` (Agent type field; migration 0017) and seeded all 18 agents (0017 Grammarly, 0018 the rest) with 4 plain-language phrases each. Detail page renders a "Good for" section of grape-tinted chips, only when `use_cases` is non-empty (guarded with `?? []`). Rendered via a `GoodFor` helper in two responsive instances: desktop full-width above the About/At-a-Glance grid (`hidden sm:block`), mobile as a grid child between About and At a Glance (`sm:hidden`). `getTasksForAgent`/`QuickTaskCard`/`agent_tasks` are now unused by the app.
+---
 
-### Current catalog (18 real agents)
+## What's next (ordered)
 
-All seeded `trust_tier: listed`, `status: published`, `average_rating: null`, `review_count: 0` (no fabricated ratings on real products — they earn reviews over time). Logos are neutral DiceBear placeholders, not the companies' real logos (avoids implying endorsement). Descriptions are original, written from each product's public site.
-
-| Slug | Name | Category | Pricing |
-|---|---|---|---|
-| grammarly | Grammarly | Writing & Communication | freemium |
-| wordtune | Wordtune | Writing & Communication | freemium |
-| khanmigo | Khanmigo | Learning & Skills | freemium |
-| duolingo | Duolingo | Learning & Skills | freemium |
-| cleo | Cleo | Money & Finances | freemium |
-| copilot-money | Copilot Money | Money & Finances | subscription |
-| ohai-ai | Ohai.ai | Home & Family | subscription |
-| samsung-food | Samsung Food | Home & Family | freemium |
-| wysa | Wysa | Health & Wellness | freemium |
-| ada-health | Ada Health | Health & Wellness | free |
-| whoop | WHOOP | Health & Wellness | subscription |
-| headspace | Headspace | Health & Wellness | subscription |
-| midjourney | Midjourney | Hobbies & Creative | subscription |
-| suno | Suno | Hobbies & Creative | freemium |
-| mindtrip | Mindtrip | Travel & Planning | freemium |
-| hopper | Hopper | Travel & Planning | free |
-| guidegeek | GuideGeek | Travel & Planning | free |
-| wanderlog | Wanderlog | Travel & Planning | freemium |
-
-Full descriptions/taglines for the first 12 live in `REAL_AGENTS_DRAFT.md` at the repo root; the 6 added in 0016 live in that migration file. Listing real products needs no permission (nominative fair use); *monetizing* via affiliate requires joining each product's program (a Phase 3 step). Per-category counts are now: Writing 2, Learning 2, Money 2, Home 2, Health & Wellness 4, Hobbies 2, Travel & Planning 4.
-
-### Current categories (7)
-
-`Writing & Communication`, `Learning & Skills`, `Money & Finances`, `Home & Family`, `Health & Wellness`, `Hobbies & Creative`, `Travel & Planning`. Defined in `CATEGORIES` const in `src/types/database.ts`.
-
-### Current life-stage tags (12)
-
-`Parents`, `New Parents`, `Students`, `Adult Learners`, `Renters`, `Job Seekers`, `Hobbyists`, `Creators`, `Caregivers`, `Travelers`, `Couples`, `Quantified-Self`. Defined in `LIFE_STAGE_TAGS` const. Surfaced as a 10-chip row on the homepage and a "For Who" filter section on `/agents`.
-
-### Design system — "Sunset Pop" (DONE, shipped across all surfaces)
-
-The aesthetic was intentionally simple; the user wanted it more eye-catching. We mocked 3 homepage directions, the user picked **Direction B (Bold Pop)**, then chose the **B2 "Sunset Pop"** sub-variant as the final look. The system: warm-cream page (`#FFF9F4`), a coral→pink→violet hero gradient (`#FF6B4A → #FF3D77 → #8B2FE6`) with rounded-bottom corners and soft decorative circles, **buttercream `#FFD23D`** as the primary CTA/accent, **Space Grotesk** for display/headlines + **Inter** for body, ink text `#2A1A2E`, and soft pillowy cards (no hard borders; gentle colored shadows; colored top-accent bar). Tokens live in `tailwind.config.ts` (`cream`, `ink`, `coral`, `punch`, `grape`, `butter`, `muted`) + `fontFamily.sans`/`fontFamily.display`; fonts loaded via `next/font` in `layout.tsx`; page bg/foreground in `globals.css`.
-
-Converted surfaces (every page + shared component): homepage, AgentCard, Header/footer, NavAuthLinks, HomeSearch; Browse (`/agents`) + FilterSidebar + SearchBar; detail (`/agents/[slug]`) + ReviewsSection/ReviewForm/ReviewsList/QuickTaskCard/EvalRow/SignInModal; Submit + SubmitForm; Dashboard + DashboardCard/DashboardSignInGate/HowToClimbModal; Feedback + FeedbackForm. **Zero `indigo-*` classes remain in `src/`.** Intentionally kept as semantic (not brand) colors: trust-tier chips (`listed`=neutral slate, `verified`=grape, `vetted`=emerald, `audited`=amber in `TIER_COLORS`), letter-grade colors, pricing/complexity badges, amber rating stars + neutral `slate-200` empty stars, emerald success / red error / amber "promote"/issues states, neutral slate for `enterprise` pricing + "Not approved" status. Also fixed lingering business-voice copy on Browse + Submit (no more "for your team / business professionals"; Submit's old "Industry tags" field is now "Who it's for" with life-stage examples). All changes pass `tsc --noEmit` + `next lint`, and are **shipped to GitHub/Vercel and live**. (Two throwaway mockup files at the repo root — `homepage-redesign-mockups.html`, `homepage-bold-variations.html` — were removed in a cleanup commit.)
-
-### What's next (not yet built)
-
-- **Mobile category-chips row (optional follow-on).** A horizontal-scroll row of category chips at the top of mobile Browse for one-tap filtering, complementing the existing `MobileFilters` drawer. Discussed, not built.
-- **Phase 3 — Affiliate-link infrastructure.** Add `affiliate_url` column to agents, update outbound CTAs ("Visit Website" on detail pages, "Run this task" in Quick Tasks) to use the affiliate URL when present, log click-throughs with affiliate attribution. The load-bearing piece that turns the consumer pivot into actual revenue.
-- **Phase 4 — Comparison surface.** Side-by-side compare page, "vs alternatives" link on detail pages. Higher value with the AI-curious cohort.
-- **Phase 5 — SEO + editorial content.** Programmatic `/best/{category}` pages, write-ups. Bigger lift.
-- **LLM-classified search.** After 2-3 weeks of `search_events` data, decide whether to upgrade from lexical FTS to LLM-classified search. The Snowball stemmer's blind spots will be visible in the zero-result rows.
-
-### Known debt (non-blocking)
-
-- `schema.sql`'s top drop-list is missing entries for `agent_tasks`, `agent_evals`, `search_events`. Fresh-clone bootstrap from `schema.sql` alone would fail to drop those tables before recreating. Cosmetic; the migrations are the operational source of truth.
-- `AuthProvider.tsx`, `ReviewsList.tsx`, `SignInModal.tsx` each have a single `react-hooks/exhaustive-deps` warning. Pre-existing, non-blocking. Worth a cleanup pass eventually.
-- Quick Tasks plumbing is now orphaned after the "Good for" repurpose: `QuickTaskCard.tsx`, `getTasksForAgent` in `lib/agents.ts`, the `agent_tasks` table (migration 0007), and `seed_tasks.sql` are no longer referenced by the app. Harmless, but a candidate for a full removal pass (drop the table + dead code) if we want to fully retire it.
-- `PLACEHOLDER_AGENTS` in `lib/agents.ts` still holds the 5 OLD fictional entries (Draftly / BudgetSense / MealMate / DayPulse / Journie). It's now used *only* as the dev-without-Supabase fallback — the homepage no longer displays it. Stale but harmless; worth swapping for a couple of real entries eventually.
-- The smart-import server action does a full `.text()` then `.slice(0, 200 * 1024)` — the body is downloaded entirely before truncation. The 5s timeout is the actual hostile-input protection. Worth switching to streaming if it becomes a hotspot.
-- Two emoji collisions on the homepage are kept *by design* as semantic anchors: 🏠 appears on both the "Home & Family" category tile and the "Renters" chip; ✈️ on both "Travel & Planning" and "Travelers". Documented and accepted.
-- Life-stage chip coverage shifted with the new real catalog (per-chip agent counts are no longer those in this doc). Some chips match few or no agents until the catalog grows. Not a bug.
-- The homepage "A few to get you started" row shows the first 3 published agents by `review_count` desc — with every real agent at 0 reviews, that ordering is effectively arbitrary for now. Fine until there are real ratings or curated featured picks.
-
-### Working rhythm
-
-The recent working loop (in Cowork):
-1. The user brings a strategic question or a goal; we align on direction first — often via multiple-choice clarifying questions — before any code.
-2. Claude edits the repo files directly (Read/Write/Edit), keeping changes small and matching existing patterns.
-3. Claude verifies every change with `npx tsc --noEmit` and `npx next lint --file ...` before handing off — both must be clean (unescaped apostrophes in JSX and unused imports will fail the Vercel build).
-4. Claude pastes any SQL migration inline in chat, clearly labeled "in the Supabase SQL editor," for the user to run.
-5. Claude gives exact `git` commands, clearly labeled "in your Terminal," to commit + push; pushing auto-deploys to Vercel.
-6. The user runs a smoke test (visual + an SQL `SELECT`) and reports back; Claude marks the step done.
-
-(Earlier in the project the loop ran through Claude Code with pasted prompts — that still works, but recent sessions edit directly via Cowork. Claude cannot push from its sandbox; the user always runs git from their own terminal.)
-
-**Cadence preferences:**
-- One reviewable step at a time; the user often says "slow and steady." Big changes are split into sub-steps, each verified before the next.
-- Commands are labeled by tool (Terminal vs Supabase) — conflating them has caused errors (e.g. pasting a `cat … | pbcopy` line into the SQL editor).
-- Destructive actions (deletes, drops) are confirmed before running.
-- A running task list tracks multi-step work so the user can see progress.
+1. **Gmail verification + email live** — unblocks X account and outreach
+2. **X account setup** — @bindieai, bindie.ai in bio, link to site
+3. **First 10 outreach emails** — HumToBeats, Yogakosh, WhatCable + 7 more from Product Hunt research
+4. **Impact affiliate signup** — once maxwell@bindie.ai is live; apply to Grammarly + Canva programs first
+5. **Phase 3c** — populate affiliate_url for enrolled agents via Supabase SQL
+6. **Product Hunt prep** — maker profile, screenshots, tagline (when closer to launch)
+7. **Deferred:** Custom domain email aliases, referral program (shelved), Workshop W4/W5 (shelved), SEO programmatic pages, Quick Tasks cleanup
 
 ---
 
 ## How to get oriented quickly
 
-If you're a fresh Claude reading this for the first time:
-
-1. **Skim this file.** Especially the "What this is" section (strategic anchors), the conventions, and "What's next".
-2. **Read `src/types/database.ts`** to get the data model in one place: enums, interfaces, label maps, helper functions. It's the densest file in the project for understanding the domain.
-3. **Read `src/lib/agents.ts`** for the data-access patterns: `getAgents`, `getAgentBySlug`, `getFeaturedAgents`, `getLatestEvalsForAgent`, `getReviewStatsForAgent`, `getReviewCountSparkline`, `getTasksForAgent`. These are the canonical query helpers.
-4. **Skim `src/app/page.tsx`** for the homepage structure and what the buyer sees first.
-5. **Run `git log --oneline -15`** to see the recent prompt-commits in order — the messages are descriptive enough to reconstruct the rough build sequence.
-
-You should then be able to pick up a strategic conversation or a new prompt without rescanning the codebase. If the user asks you to verify a prompt they just ran, the routine is: `git diff HEAD --stat`, then `git diff HEAD -- <file>` for each file of interest, then walk them through a smoke test.
+1. Skim this file — especially "What this is", "Go-to-market status", and "What's next".
+2. Read `src/types/database.ts` for the full data model.
+3. Read `src/lib/agents.ts` for all data-access helpers.
+4. Skim `src/app/page.tsx` for the homepage structure.
+5. Run `git log --oneline -10` to see recent commits.
+6. Read `WORKSHOP_RUNBOOK.md` for all Workshop SQL recipes.
