@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PageProps) {
   const agent = await getAgentBySlug(params.slug)
   if (!agent) return {}
 
-  const title = `${agent.name} Review — ${agent.tagline} | Bindie`
+  const title = `${agent.name} Review — ${agent.tagline} | bindie.ai`
   const description = agent.description.slice(0, 155) + '…'
 
   return {
@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: PageProps) {
       title,
       description,
       type: 'website',
-      siteName: 'Bindie',
+      siteName: 'bindie.ai',
     },
     twitter: {
       card: 'summary',
